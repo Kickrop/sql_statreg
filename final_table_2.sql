@@ -5,7 +5,7 @@
 --
 --select * from org_inf oi where okpo = '08741405030002'
 --drop materialized view statregistr.registr
-create materialized view statregistr.registr as
+--create materialized view statregistr.registr as
 --version 2
 with registr as (
 select 
@@ -263,8 +263,8 @@ select
 	end as org_izm
 	,case when ron_match.pole_1 is not null then 1 else 0 end as lic_ron	
 	,case 
-		when is_dod = 1 then 1
-		when is_dod = 0 then 0
+		when included_in_registr = 1 and is_dod = 1 then 1
+		when included_in_registr = 1 and is_dod = 0 then 2
 		when included_in_registr = 2 then 3
 	end as included_in_fsn		
 --select count(distinct oi.okpo)	
@@ -320,6 +320,7 @@ from
 where included_in_registr in (1,2)		
 )
 select * from registr 
+where included_in_fsn = 2
 
 
 --CREATE INDEX idx_ron_match_edu_okpo ON statreg7_ron_matched_edu_level(pole_1);

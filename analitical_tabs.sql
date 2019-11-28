@@ -1,4 +1,4 @@
---С‚СЋРјРµРЅСЃРєР°СЏ Рё Р°СЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ
+--тюменская и архангельская
 with tum_arh_ao as (
 select 
 	--left(okato_fact,2) sub_2_dig,
@@ -21,11 +21,11 @@ where
 )
 select 
 	case 
-		when left(arh,3) = '112' or left(arh,3) = '114' or left(arh,3) = '115' then 'РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ' 
-		when left(arh,3) = '111' then 'РќРµРЅРµС†РєРёР№ РђРћ' --else 'Р°СЂС… Р±РµР· РђРћ'
-		when left(arh,4) = '7114' then 'РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ' --else 'С‚СЋРј Р±РµР· РђРћ'
-		when left(arh,4) = '7111' or left(arh,4) = '7113' or left(arh,4) = '7118' then 'РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ'
-		when left(arh,3) = '712' or left(arh,3) = '714' or (left(arh,3) = '711' and not left(arh,4) = '7111') then 'РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ'
+		when left(arh,3) = '112' or left(arh,3) = '114' or left(arh,3) = '115' then 'Архангельская область кроме Ненецкого АО' 
+		when left(arh,3) = '111' then 'Ненецкий АО' --else 'арх без АО'
+		when left(arh,4) = '7114' then 'Ямало-Ненецкий АО' --else 'тюм без АО'
+		when left(arh,4) = '7111' or left(arh,4) = '7113' or left(arh,4) = '7118' then 'Ханты-Мансийский АО'
+		when left(arh,3) = '712' or left(arh,3) = '714' or (left(arh,3) = '711' and not left(arh,4) = '7111') then 'Тюменская область без АО'
 	end as tum_arh
 	--,arh
 	, count(*)
@@ -33,14 +33,14 @@ from tum_arh_ao
 group by tum_arh
 
 --
---С‚Р°Р±Р»РёС†Р° 2Р±
+--таблица 2б
 --
 --select *
 ----delete 
 --from okato_codes
---where sub_name in ('РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ','РќРµРЅРµС†РєРёР№ Р°РІС‚РѕРЅРѕРјРЅС‹Р№ РѕРєСЂСѓРі','РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ','РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ','РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ')
+--where sub_name in ('Архангельская область кроме Ненецкого АО','Ненецкий автономный округ','Ханты-Мансийский АО','Ямало-Ненецкий АО','Тюменская область без АО')
 
---РіРѕСЂРѕРґР°
+--города
 with tab_2b as ( 
 select 
 	org_inf.okpo
@@ -72,11 +72,11 @@ where
 	(SUBSTRING(okato_fact, 3, 1) = '4' or
 	SUBSTRING(okato_fact, 6, 1) = '5')
 )
-select sub_name, count(distinct okpo) as "Р“РѕСЂРѕРґР°"
+select sub_name, count(distinct okpo) as "Города"
 from tab_2b
 group by sub_name
 union 
-select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+select '1_Всего', count(distinct okpo)
 from tab_2b
 order by sub_name
 --
@@ -91,11 +91,11 @@ where
 	(SUBSTRING(pole_11, 3, 1) = '4' or
 	SUBSTRING(pole_11, 6, 1) = '5') and right(pole_11,3)::int = 0--or left(pole_11,2) in ('40','67')
 ) 
-select sub_name, count(distinct okpo) as "Р“РѕСЂРѕРґ"
+select sub_name, count(distinct okpo) as "Город"
 from tab_2b
 group by sub_name
 union 
-select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+select '1_Всего', count(distinct okpo)
 from tab_2b
 order by sub_name
 --
@@ -148,18 +148,18 @@ where
 	is_dod = 1 and 
 	right(pole_11,3) = '000' and pole_11 <> '36217820000'
 ) 
-select sub_name, count(distinct okpo) as "Р“РѕСЂРѕРґ"
+select sub_name, count(distinct okpo) as "Город"
 from tab_2b
 group by sub_name
 union 
-select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+select '1_Всего', count(distinct okpo)
 from tab_2b
 order by sub_name
 
 
 
 
---С‚Р°Р±Р»РёС†Р° 2РІ, СЃРµР»Рѕ
+--таблица 2в, село
 --with tab_2b as ( 
 --select 
 --	org_inf.okpo
@@ -191,11 +191,11 @@ order by sub_name
 --	(SUBSTRING(okato_fact, 6, 1) in ('8','9') or
 --	right(okato_fact,3)::int between 1 and 999)
 --)
---select sub_name, count(distinct okpo) as "РЎРµР»Рѕ"
+--select sub_name, count(distinct okpo) as "Село"
 --from tab_2b
 --group by sub_name
 --union 
---select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+--select '1_Всего', count(distinct okpo)
 --from tab_2b
 --order by sub_name
 --
@@ -210,15 +210,15 @@ where
 	(SUBSTRING(pole_11, 6, 1) in ('8','9') or
 	right(pole_11,3)::int between 1 and 999)
 ) 
-select sub_name, count(distinct okpo) as "РЎРµР»Рѕ"
+select sub_name, count(distinct okpo) as "Село"
 from tab_2bs
 group by sub_name
 union 
-select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+select '1_Всего', count(distinct okpo)
 from tab_2bs
 order by sub_name
 
---РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ РѕРєР°С‚Рѕ
+--пересекающиеся окато
 select a.pole_11 selo, b.pole_11 gorod, b.sub_name 
 	--count(*)
 from 
@@ -248,7 +248,7 @@ on a.pole_11=b.pole_11
 
 
 --
---С‚Р°Р±Р»РёС†Р° 2Р°, РІСЃРµРіРѕ
+--таблица 2а, всего
 --with tab_2b as ( 
 --select 
 --	org_inf.okpo
@@ -278,11 +278,11 @@ on a.pole_11=b.pole_11
 --	statregistr7.okpo_id is null and
 --	is_dod = 1
 --)
---select sub_name, count(distinct okpo) as "Р’СЃРµРіРѕ"
+--select sub_name, count(distinct okpo) as "Всего"
 --from tab_2b
 --group by sub_name
 --union 
---select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+--select '1_Всего', count(distinct okpo)
 --from tab_2b
 --order by sub_name
 
@@ -295,11 +295,11 @@ from _0_analit_tab_1
 where 
 	is_dod = 1
 ) 
-select sub_name, count(distinct okpo) as "Р’СЃРµРіРѕ"
+select sub_name, count(distinct okpo) as "Всего"
 from tab_2a
 group by sub_name
 union 
-select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+select '1_Всего', count(distinct okpo)
 from tab_2a
 order by sub_name
 --
@@ -316,7 +316,7 @@ where is_dod = 1
 select *
 from statregistr7
 where SUBSTRING(pole_11, 6)::int > 0
---РґРѕР±Р°РІРёС‚СЊ РІРµРґСѓС‰РёР№ РЅРѕР»СЊ РѕРєР°С‚Рѕ РѕСЂРіР°РЅРёР·Р°С†РёРё
+--добавить ведущий ноль окато организации
 ----select *
 --update statregistr7
 --set pole_10 = '01202807001'
@@ -372,11 +372,11 @@ where
 select * from tab_1
 --
 --select
---	sub_name, count(distinct okpo) as "Р’СЃРµРіРѕ"
+--	sub_name, count(distinct okpo) as "Всего"
 --from tab_1
 --group by sub_name
 --union 
---select '1_Р’СЃРµРіРѕ', count(distinct okpo)
+--select '1_Всего', count(distinct okpo)
 --from tab_1
 --order by sub_name
 
@@ -450,48 +450,48 @@ select vsego.*
 	,dod_ur_lic.dod_ur_lic
 	,dod_filial.dod_filial
 from (
-	select 'Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ' as rf,count(okpo) as vsego from statregistr._0_analit_tab_1
+	select 'Российская Федерация' as rf,count(okpo) as vsego from statregistr._0_analit_tab_1
 	where 
 		included_in_registr = 1
-		and sub_name <> 'Р‘Р°Р№РєРѕРЅСѓСЂ'
+		and sub_name <> 'Байконур'
 	) vsego
 left join (
-	select 'Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ' as rf,count(okpo) as ur_lic from statregistr._0_analit_tab_1
+	select 'Российская Федерация' as rf,count(okpo) as ur_lic from statregistr._0_analit_tab_1
 	where 
 		included_in_registr = 1 and
 		pole_9 = '1'
-		and sub_name <> 'Р‘Р°Р№РєРѕРЅСѓСЂ'
+		and sub_name <> 'Байконур'
 ) ur_lic
 on vsego.rf = ur_lic.rf	
 left join (
-	select 'Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ' as rf,count(okpo) as filial from statregistr._0_analit_tab_1
+	select 'Российская Федерация' as rf,count(okpo) as filial from statregistr._0_analit_tab_1
 	where 
 		included_in_registr = 1 and
 		pole_9 in ('2','3')
-		and sub_name <> 'Р‘Р°Р№РєРѕРЅСѓСЂ'
+		and sub_name <> 'Байконур'
 ) filial
 on vsego.rf = filial.rf	
 left join (
-	select 'Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ' as rf,count(okpo) as dod from statregistr._0_analit_tab_1
+	select 'Российская Федерация' as rf,count(okpo) as dod from statregistr._0_analit_tab_1
 	where 
 		is_dod = 1 
-		and sub_name <> 'Р‘Р°Р№РєРѕРЅСѓСЂ'
+		and sub_name <> 'Байконур'
 ) dod
 on vsego.rf = dod.rf
 left join (
-	select 'Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ' as rf,count(okpo) as dod_ur_lic from statregistr._0_analit_tab_1
+	select 'Российская Федерация' as rf,count(okpo) as dod_ur_lic from statregistr._0_analit_tab_1
 	where 
 		is_dod = 1 and 
 		pole_9 = '1'
-		and sub_name <> 'Р‘Р°Р№РєРѕРЅСѓСЂ'
+		and sub_name <> 'Байконур'
 ) dod_ur_lic
 on vsego.rf = dod_ur_lic.rf
 left join (
-	select 'Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ' as rf,count(okpo) as dod_filial from statregistr._0_analit_tab_1
+	select 'Российская Федерация' as rf,count(okpo) as dod_filial from statregistr._0_analit_tab_1
 	where 
 		is_dod = 1 and 
 		pole_9 in ('2','3')
-		and sub_name <> 'Р‘Р°Р№РєРѕРЅСѓСЂ'
+		and sub_name <> 'Байконур'
 ) dod_filial
 on vsego.rf = dod_filial.rf
 union
@@ -505,11 +505,11 @@ select
 from
 (select 
 	case 
-		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ' 
-		when left(pole_11,3) = '111' then 'РќРµРЅРµС†РєРёР№ РђРћ' --else 'Р°СЂС… Р±РµР· РђРћ'
-		when left(pole_11,4) in ('7114','7115','7116','7117') then 'РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ' --else 'С‚СЋРј Р±РµР· РђРћ' '7116',
-		when left(pole_11,4) in ('7111','7112','7113','7118') then 'РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ'
-		when left(pole_11,3) in ('712','714') then 'РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ'
+		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'Архангельская область кроме Ненецкого АО' 
+		when left(pole_11,3) = '111' then 'Ненецкий АО' --else 'арх без АО'
+		when left(pole_11,4) in ('7114','7115','7116','7117') then 'Ямало-Ненецкий АО' --else 'тюм без АО' '7116',
+		when left(pole_11,4) in ('7111','7112','7113','7118') then 'Ханты-Мансийский АО'
+		when left(pole_11,3) in ('712','714') then 'Тюменская область без АО'
 	end as tum_arh
 	,count(okpo) as vsego
 from _0_analit_tab_1
@@ -521,11 +521,11 @@ group by tum_arh
 left join
 (select 
 	case 
-		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ' 
-		when left(pole_11,3) = '111' then 'РќРµРЅРµС†РєРёР№ РђРћ' --else 'Р°СЂС… Р±РµР· РђРћ'
-		when left(pole_11,4) in ('7114','7115','7116','7117') then 'РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ' --else 'С‚СЋРј Р±РµР· РђРћ' '7116',
-		when left(pole_11,4) in ('7111','7112','7113','7118') then 'РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ'
-		when left(pole_11,3) in ('712','714') then 'РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ'
+		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'Архангельская область кроме Ненецкого АО' 
+		when left(pole_11,3) = '111' then 'Ненецкий АО' --else 'арх без АО'
+		when left(pole_11,4) in ('7114','7115','7116','7117') then 'Ямало-Ненецкий АО' --else 'тюм без АО' '7116',
+		when left(pole_11,4) in ('7111','7112','7113','7118') then 'Ханты-Мансийский АО'
+		when left(pole_11,3) in ('712','714') then 'Тюменская область без АО'
 	end as tum_arh
 	,count(okpo) as ur_lic
 from _0_analit_tab_1
@@ -539,11 +539,11 @@ on tum_arh_vsego.tum_arh = ur_lic.tum_arh
 left join
 (select 
 	case 
-		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ' 
-		when left(pole_11,3) = '111' then 'РќРµРЅРµС†РєРёР№ РђРћ' --else 'Р°СЂС… Р±РµР· РђРћ'
-		when left(pole_11,4) in ('7114','7115','7116','7117') then 'РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ' --else 'С‚СЋРј Р±РµР· РђРћ' '7116',
-		when left(pole_11,4) in ('7111','7112','7113','7118') then 'РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ'
-		when left(pole_11,3) in ('712','714') then 'РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ'
+		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'Архангельская область кроме Ненецкого АО' 
+		when left(pole_11,3) = '111' then 'Ненецкий АО' --else 'арх без АО'
+		when left(pole_11,4) in ('7114','7115','7116','7117') then 'Ямало-Ненецкий АО' --else 'тюм без АО' '7116',
+		when left(pole_11,4) in ('7111','7112','7113','7118') then 'Ханты-Мансийский АО'
+		when left(pole_11,3) in ('712','714') then 'Тюменская область без АО'
 	end as tum_arh
 	,count(okpo) as filial
 from _0_analit_tab_1
@@ -557,11 +557,11 @@ on tum_arh_vsego.tum_arh = filial.tum_arh
 left join
 (select 
 	case 
-		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ' 
-		when left(pole_11,3) = '111' then 'РќРµРЅРµС†РєРёР№ РђРћ' --else 'Р°СЂС… Р±РµР· РђРћ'
-		when left(pole_11,4) in ('7114','7115','7116','7117') then 'РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ' --else 'С‚СЋРј Р±РµР· РђРћ' '7116',
-		when left(pole_11,4) in ('7111','7112','7113','7118') then 'РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ'
-		when left(pole_11,3) in ('712','714') then 'РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ'
+		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'Архангельская область кроме Ненецкого АО' 
+		when left(pole_11,3) = '111' then 'Ненецкий АО' --else 'арх без АО'
+		when left(pole_11,4) in ('7114','7115','7116','7117') then 'Ямало-Ненецкий АО' --else 'тюм без АО' '7116',
+		when left(pole_11,4) in ('7111','7112','7113','7118') then 'Ханты-Мансийский АО'
+		when left(pole_11,3) in ('712','714') then 'Тюменская область без АО'
 	end as tum_arh
 	,count(okpo) as dod
 from _0_analit_tab_1
@@ -575,11 +575,11 @@ on tum_arh_vsego.tum_arh = dod.tum_arh
 left join
 (select 
 	case 
-		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ' 
-		when left(pole_11,3) = '111' then 'РќРµРЅРµС†РєРёР№ РђРћ' --else 'Р°СЂС… Р±РµР· РђРћ'
-		when left(pole_11,4) in ('7114','7115','7116','7117') then 'РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ' --else 'С‚СЋРј Р±РµР· РђРћ' '7116',
-		when left(pole_11,4) in ('7111','7112','7113','7118') then 'РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ'
-		when left(pole_11,3) in ('712','714') then 'РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ'
+		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'Архангельская область кроме Ненецкого АО' 
+		when left(pole_11,3) = '111' then 'Ненецкий АО' --else 'арх без АО'
+		when left(pole_11,4) in ('7114','7115','7116','7117') then 'Ямало-Ненецкий АО' --else 'тюм без АО' '7116',
+		when left(pole_11,4) in ('7111','7112','7113','7118') then 'Ханты-Мансийский АО'
+		when left(pole_11,3) in ('712','714') then 'Тюменская область без АО'
 	end as tum_arh
 	,count(okpo) as dod_ur_lic
 from _0_analit_tab_1
@@ -594,11 +594,11 @@ on tum_arh_vsego.tum_arh = dod_ur_lic.tum_arh
 left join
 (select 
 	case 
-		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'РђСЂС…Р°РЅРіРµР»СЊСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ РєСЂРѕРјРµ РќРµРЅРµС†РєРѕРіРѕ РђРћ' 
-		when left(pole_11,3) = '111' then 'РќРµРЅРµС†РєРёР№ РђРћ' --else 'Р°СЂС… Р±РµР· РђРћ'
-		when left(pole_11,4) in ('7114','7115','7116','7117') then 'РЇРјР°Р»Рѕ-РќРµРЅРµС†РєРёР№ РђРћ' --else 'С‚СЋРј Р±РµР· РђРћ' '7116',
-		when left(pole_11,4) in ('7111','7112','7113','7118') then 'РҐР°РЅС‚С‹-РњР°РЅСЃРёР№СЃРєРёР№ РђРћ'
-		when left(pole_11,3) in ('712','714') then 'РўСЋРјРµРЅСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ Р±РµР· РђРћ'
+		when left(pole_11,3) = '112' or left(pole_11,3) = '114' or left(pole_11,3) = '115' then 'Архангельская область кроме Ненецкого АО' 
+		when left(pole_11,3) = '111' then 'Ненецкий АО' --else 'арх без АО'
+		when left(pole_11,4) in ('7114','7115','7116','7117') then 'Ямало-Ненецкий АО' --else 'тюм без АО' '7116',
+		when left(pole_11,4) in ('7111','7112','7113','7118') then 'Ханты-Мансийский АО'
+		when left(pole_11,3) in ('712','714') then 'Тюменская область без АО'
 	end as tum_arh
 	,count(okpo) as dod_filial
 from _0_analit_tab_1
@@ -618,39 +618,39 @@ select vsego.*
 	,dod_ur_lic.dod_ur_lic
 	,dod_filial.dod_filial
 from (
-	select 'Р’СЃРµРіРѕ' as rf,count(okpo) as vsego from statregistr._0_analit_tab_1
+	select 'Всего' as rf,count(okpo) as vsego from statregistr._0_analit_tab_1
 	where 
 		included_in_registr = 1
 	) vsego
 left join (
-	select 'Р’СЃРµРіРѕ' as rf,count(okpo) as ur_lic from statregistr._0_analit_tab_1
+	select 'Всего' as rf,count(okpo) as ur_lic from statregistr._0_analit_tab_1
 	where 
 		included_in_registr = 1 and
 		pole_9 = '1'
 ) ur_lic
 on vsego.rf = ur_lic.rf	
 left join (
-	select 'Р’СЃРµРіРѕ' as rf,count(okpo) as filial from statregistr._0_analit_tab_1
+	select 'Всего' as rf,count(okpo) as filial from statregistr._0_analit_tab_1
 	where 
 		included_in_registr = 1 and
 		pole_9 in ('2','3')
 ) filial
 on vsego.rf = filial.rf	
 left join (
-	select 'Р’СЃРµРіРѕ' as rf,count(okpo) as dod from statregistr._0_analit_tab_1
+	select 'Всего' as rf,count(okpo) as dod from statregistr._0_analit_tab_1
 	where 
 		is_dod = 1 
 ) dod
 on vsego.rf = dod.rf
 left join (
-	select 'Р’СЃРµРіРѕ' as rf,count(okpo) as dod_ur_lic from statregistr._0_analit_tab_1
+	select 'Всего' as rf,count(okpo) as dod_ur_lic from statregistr._0_analit_tab_1
 	where 
 		is_dod = 1 and 
 		pole_9 = '1'
 ) dod_ur_lic
 on vsego.rf = dod_ur_lic.rf
 left join (
-	select 'Р’СЃРµРіРѕ' as rf,count(okpo) as dod_filial from statregistr._0_analit_tab_1
+	select 'Всего' as rf,count(okpo) as dod_filial from statregistr._0_analit_tab_1
 	where 
 		is_dod = 1 and 
 		pole_9 in ('2','3')
@@ -690,10 +690,10 @@ select
 	,sum(dod_filial) dod_filial
 from _1_analit_tab_1
 	join okato_codes on _1_analit_tab_1.sub_name=okato_codes.sub_name
-	join fo_codes on fo_codes."п»їfo_code" = okato_codes.fo
+	join fo_codes on fo_codes."?fo_code" = okato_codes.fo
 group by fo_name) tab1_fo
 join sub_order on sub_order.sub=tab1_fo.sub_name
-order by sub_order."п»їsub_order"::int
+order by sub_order."?sub_order"::int
 
 
 	
