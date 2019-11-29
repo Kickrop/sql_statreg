@@ -45,14 +45,7 @@ left join
 		on aokv.okpo = oi.okpo	
 ) x
 where okved_add is not null
-
-
---	,case 
---			when pole_22 like '%85.41%' then '85.41' 
---			when aokv.str_n::int = 2 and gr4_okved_add like '%85.41%' then '85.41' 
---	end as okved_add
-
-
+--
 
 select count(distinct pole_1)
 from statreg7_ron_matched_edu_level
@@ -67,10 +60,10 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and (r122.gr3::int<>1 and r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and edu_level::text in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status <> 'Не действует' then 1
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status <> 'Не действует' then 1
 		--when r122.okpo is null and included_in_registr = 1 and edu_level::text not in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
-		else 0
+		--when included_in_registr = 2 then null
+		--else 0
 	end as lic_do 
 from org_inf 
 	left join razdel_1_2_2 r122
@@ -79,16 +72,16 @@ from org_inf
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
-		select okpo_id,array_agg(edu_level) as edu_level 
+		select okpo_id,array_agg(edu_level)::text as edu_level 
 		from statreg7_ron_matched_edu_level
 		group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
-where r122.str_n::int = 2 and included_in_registr in (1,2)
+--where r122.str_n::int = 2 and included_in_registr in (1,2)
 )
 SELECT okpo, lic_do
 from pam
-where lic_do is not null
+where lic_do is not null --and lic_do=1
 
 --statreg7_ron_matched_edu_level lic_no
 drop materialized view lic_no --!!
@@ -99,11 +92,11 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Начальное общее образование') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Начальное общее образование') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
-		else 0
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
+		when r122.okpo is null and included_in_registr = 1 and edu_level like ('%Начальное общее образование%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Начальное общее образование') and license_status = 'Не действует' then 0
+		--when included_in_registr = 2 then null
+		--else 0
 	end as lic_no
 from org_inf 
 	left join razdel_1_2_2 r122
@@ -117,15 +110,15 @@ from org_inf
 	group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
-where r122.str_n::int = 3 and included_in_registr in (1,2)
+--where r122.str_n::int = 3 and included_in_registr in (1)
 )
 select okpo, lic_no
 from pam
-where lic_no is not null --and lic_no = 1
+where lic_no is not null and lic_no = 1
 --
 
 --statreg7_ron_matched_edu_level lic_oo
---drop materialized view lic_oo --доработать
+--drop materialized view lic_oo !!
 create materialized view lic_oo as
 --
 with pam as (
@@ -133,14 +126,15 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 4 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 4 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Основное общее образование','Дополнительное основное общее образование') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Основное общее образование','Дополнительное основное общее образование') and license_status = 'Не действует' then 0
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 4 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Основное общее образование%' or edu_level like '%Дополнительное основное общее образование%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Основное общее образование','Дополнительное основное общее образование') and license_status = 'Не действует' then 0
+		--else 0
 	end as lic_oo	
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -150,13 +144,14 @@ from org_inf
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
 --where r122.okpo is null 
+--where r122.str_n::int = 4 and included_in_registr in (1)
 )
 select okpo, lic_oo
 from pam
-where lic_oo is not null
+where lic_oo is not null --and lic_oo =1
 ---
 	 
-drop materialized view lic_so	
+drop materialized view lic_so	--!!
 create materialized view lic_so as
 --
 with pam as (
@@ -164,15 +159,16 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when included_in_registr = 1 and r122.str_n = 5 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when included_in_registr = 1 and r122.str_n = 5 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее общее образование','Среднее (полное) общее образование') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее общее образование','Среднее (полное) общее образование') and license_status = 'Не действует' then 0
+		--when included_in_registr = 1 and r122.str_n = 5 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Среднее общее образование%' or edu_level like '%Среднее (полное) общее образование%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее общее образование','Среднее (полное) общее образование') and license_status = 'Не действует' then 0
 		when included_in_registr = 2 then null
+		else 0
 	end as lic_so
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -181,44 +177,46 @@ from org_inf
 	group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
---where r122.okpo is null 
+--where r122.str_n::int = 5 and included_in_registr in (1)		
 )
 select okpo, lic_so
 from pam
-where lic_so is not null	
+where lic_so is not null --and lic_so=1
 ---
 ---
 
 
-create materialized view lic_spo as
+create materialized view lic_spo as --!!
 --
 with pam as (
 select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
-		when included_in_registr = 1 and r122.str_n = 6 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
-		when included_in_registr = 1 and r122.str_n = 6 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее профессиональное образование','Начальное профессиональное образование') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее профессиональное образование','Начальное профессиональное образование') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
+		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 6 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
+		--when included_in_registr = 1 and r122.str_n = 6 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Среднее профессиональное образование%' or edu_level like '%Начальное профессиональное образование%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее профессиональное образование','Начальное профессиональное образование') and license_status = 'Не действует' then 0
+		--when included_in_registr = 2 then null
+		--when included_in_registr = 1 then 0
 	end as lic_spo
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
-	left join 
+	join 
 	(
-	select okpo_id,array_agg(edu_level)::text as edu_level 
-	from statreg7_ron_matched_edu_level
-	group by okpo_id
+		select okpo_id,array_agg(edu_level)::text as edu_level 
+		from statreg7_ron_matched_edu_level
+		group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
+--where included_in_registr in (1)		
 --where r122.okpo is null 
 )
 select okpo, lic_spo
 from pam
-where lic_spo is not null	
+where lic_spo is not null --and lic_spo=1
 --
 
 
@@ -229,15 +227,15 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when included_in_registr = 1 and r122.str_n = 7 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
-		when included_in_registr = 1 and r122.str_n = 7 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Бакалавриат','Высшее образование - бакалавриат') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Бакалавриат','Высшее образование - бакалавриат') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
+		--when included_in_registr = 1 and r122.str_n = 7 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - Бакалавриат%' or edu_level like '%Высшее образование - бакалавриат%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Бакалавриат','Высшее образование - бакалавриат') and license_status = 'Не действует' then 0
+		--when included_in_registr = 2 then null
 	end as lic_vo_b
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -262,15 +260,15 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when included_in_registr = 1 and r122.str_n = 8 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when included_in_registr = 1 and r122.str_n = 8 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Специалитет','Высшее образование - специалитет') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Специалитет','Высшее образование - специалитет') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
+		--when included_in_registr = 1 and r122.str_n = 8 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - Специалитет%' or edu_level like '%Высшее образование - специалитет%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Специалитет','Высшее образование - специалитет') and license_status = 'Не действует' then 0
+		--when included_in_registr = 2 then null
 	end as lic_vo_s
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -294,15 +292,15 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 9 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 9 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Магистратура','Высшее образование - магистратура') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Магистратура','Высшее образование - магистратура') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 9 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - Магистратура%' or edu_level like '%Высшее образование - магистратура%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Магистратура','Высшее образование - магистратура') and license_status = 'Не действует' then 0
+		--when included_in_registr = 2 then null
 	end as lic_vo_m 
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -324,24 +322,17 @@ create materialized view lic_vo_kvk as
 with pam as (
 select --* --count(org_inf.okpo)
 	org_inf.okpo
---	,case 
---		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 9 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
---		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 9 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
---		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Магистратура','Высшее образование - магистратура') and license_status <> 'Не действует' then 1
---		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Магистратура','Высшее образование - магистратура') and license_status = 'Не действует' then 0
---		when included_in_registr = 2 then null
---	end as lic_vo_m 
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 10 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 10 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - ПКВК','ВО - подготовка кадров высшей квалификации','Послевузовское профессиональное образование') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - ПКВК','ВО - подготовка кадров высшей квалификации','Послевузовское профессиональное образование') and license_status = 'Не действует' then 1
-		when included_in_registr = 2 then null
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 10 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - ПКВК%' or edu_level like '%ВО - подготовка кадров высшей квалификации%' or edu_level like '%Послевузовское профессиональное образование%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - ПКВК','ВО - подготовка кадров высшей квалификации','Послевузовское профессиональное образование') and license_status = 'Не действует' then 1
+		--when included_in_registr = 2 then null
 	end as lic_vo_kvk --проверить		
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -354,7 +345,7 @@ from org_inf
 )
 select okpo, lic_vo_kvk
 from pam
-where lic_vo_kvk is not null	
+where lic_vo_kvk is not null
 --
 
 	
@@ -365,15 +356,15 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 11 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 11 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Профессиональное обучение','Профессиональная подготовка','Программа профессиональной подготовки') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Профессиональное обучение','Профессиональная подготовка','Программа профессиональной подготовки') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 11 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Профессиональное обучение%' or edu_level like '%Профессиональная подготовка%' or edu_level like '%Программа профессиональной подготовки%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Профессиональное обучение','Профессиональная подготовка','Программа профессиональной подготовки') and license_status = 'Не действует' then 0
+		--when included_in_registr = 2 then null
 	end as lic_po
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -398,15 +389,15 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 12 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 12 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and lower(edu_level) in ('дополнительное профессиональное образование','дополнительное к начальному и среднему профессиональному образованию','дополнительное к начальному, среднему и высшему профессиональному образованию','дополнительное к среднему и высшему профессиональному образованию','дополнительное к среднему профессиональному образованию') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and lower(edu_level) in ('дополнительное профессиональное образование','дополнительное к начальному и среднему профессиональному образованию','дополнительное к начальному, среднему и высшему профессиональному образованию','дополнительное к среднему и высшему профессиональному образованию','дополнительное к среднему профессиональному образованию') and license_status = 'Не действует' then 0
-		when included_in_registr = 2 then null
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 12 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
+		when r122.okpo is null and included_in_registr = 1 and (lower(edu_level) like '%дополнительное профессиональное образование%' or lower(edu_level) like '%дополнительное к начальному и среднему профессиональному образованию%' or lower(edu_level) like '%дополнительное к начальному, среднему и высшему профессиональному образованию%' or lower(edu_level) like '%дополнительное к среднему и высшему профессиональному образованию%' or lower(edu_level) like '%дополнительное к среднему профессиональному образованию%') and license_status <> 'Не действует' then 1
+		--when r122.okpo is null and included_in_registr = 1 and lower(edu_level) in ('дополнительное профессиональное образование','дополнительное к начальному и среднему профессиональному образованию','дополнительное к начальному, среднему и высшему профессиональному образованию','дополнительное к среднему и высшему профессиональному образованию','дополнительное к среднему профессиональному образованию') and license_status = 'Не действует' then 0
+		--when included_in_registr = 2 then null
 	end as lic_dpo
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -444,14 +435,6 @@ from org_inf
 		on org_inf.okpo = r121.okpo
 	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
-	left join 
-	(
-	select okpo_id,array_agg(edu_level)::text as edu_level 
-	from statreg7_ron_matched_edu_level
-	group by okpo_id
-	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
---where r122.okpo is null 
 )
 select okpo, status_lic_o
 from pam
@@ -468,9 +451,9 @@ select --* --count(org_inf.okpo)
 		when included_in_registr = 1 and r122.str_n = 1 and r122.gr4::int = 1 then 1
 		when included_in_registr = 1 and r122.str_n = 1 and r122.gr4::int in (3,4) then 2
 		when included_in_registr = 1 and r122.str_n = 1 and r122.gr5::int = 1 and r122.gr3::int <> 1 then 3
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Дополнительное образование детей и взрослых','Дополнительное образование') and license_status in ('Действует','Действующее') then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Дополнительное образование детей и взрослых','Дополнительное образование') and license_status in ('Приостановлено','Приостановлена в части филиалов') then 2
-		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Дополнительное образование детей и взрослых','Дополнительное образование') and license_status in ('Проект') then 3
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дополнительное образование детей и взрослых%' or edu_level like '%Дополнительное образование%') and license_status in ('Действует','Действующее') then 1
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дополнительное образование детей и взрослых%' or edu_level like '%Дополнительное образование%') and license_status in ('Приостановлено','Приостановлена в части филиалов') then 2
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дополнительное образование детей и взрослых%' or edu_level like '%Дополнительное образование%') and license_status in ('Проект') then 3
 		when included_in_registr = 2 then null
 	end as status_lic_dop	
 from org_inf 
@@ -529,10 +512,6 @@ create materialized view dop_ad as
 with pam as (
 select --* --count(org_inf.okpo)
 	org_inf.okpo
---	,case 
---		when is_dod = 1 and r2.str_n::int = 1 and (r2.gr3::int = 0 or r2.gr3 is null) then max_gr3 
---		when is_dod = 1 and r2.str_n::int = 1 and r2.gr3 > 0 then r2.gr3
---	end as deti_dod	
 	,case 
 		when included_in_registr = 1 and r2.str_n::int = 11 and r2.gr3::int > 0 then 1 
 		when included_in_registr = 1 and r2.str_n::int = 11 and r2.gr3::int <= 0 then 0 
@@ -596,10 +575,6 @@ create materialized view dop_dod_fs as
 with pam as (
 select --* --count(org_inf.okpo)
 	org_inf.okpo
---	,case 
---		when included_in_registr = 1 and r2.str_n::int = 3 and r2.gr3::int > 0 then 1
---		when included_in_registr = 1 and r2.str_n::int = 3 and r2.gr3::int <= 0 then 0
---	end as dop_dod_is
 	,case 
 		when included_in_registr = 1 and r2.str_n::int = 4 and r2.gr3::int > 0 then 1
 		when included_in_registr = 1 and r2.str_n::int = 4 and r2.gr3::int <= 0 then 0
