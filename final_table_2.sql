@@ -5,7 +5,7 @@
 --
 --select * from org_inf oi where okpo = '08741405030002'
 --drop materialized view statregistr.registr
---create materialized view statregistr.registr as
+create materialized view statregistr.registr as
 --version 2
 with registr as (
 select 
@@ -320,7 +320,7 @@ from
 	left join noreg_org on oi.okpo = noreg_org.okpo
 where included_in_registr in (1,2)		
 )
-select count(okved_main_reg) from registr 
+select * from registr 
 --where included_in_fsn <> 3
 
 

@@ -58,7 +58,7 @@ select count(distinct pole_1)
 from statreg7_ron_matched_edu_level
 
 --statreg7_ron_matched_edu_level lic_do--доработать
-drop materialized view lic_do
+drop materialized view lic_do--!!
 create materialized view lic_do as
 --
 with pam as (
@@ -66,32 +66,32 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and (r122.gr3::int<>1 and r122.gr4::int=2) then 0 
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and (r122.gr3::int<>1 and r122.gr4::int=2) then 0 
 		when r122.okpo is null and included_in_registr = 1 and edu_level::text in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and included_in_registr = 1 and edu_level::text not in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status = 'Не действует' then 0
+		--when r122.okpo is null and included_in_registr = 1 and edu_level::text not in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status = 'Не действует' then 0
 		when included_in_registr = 2 then null
 		else 0
 	end as lic_do 
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
-	select okpo_id,array_agg(edu_level) as edu_level 
-	from statreg7_ron_matched_edu_level
-	group by okpo_id
+		select okpo_id,array_agg(edu_level) as edu_level 
+		from statreg7_ron_matched_edu_level
+		group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
-where r122.str_n::int = 2
+where r122.str_n::int = 2 and included_in_registr in (1,2)
 )
 SELECT okpo, lic_do
 from pam
 where lic_do is not null
 
---statreg7_ron_matched_edu_level lic_no--доработать
-drop materialized view lic_no
+--statreg7_ron_matched_edu_level lic_no
+drop materialized view lic_no --!!
 create materialized view lic_no as
 --
 with pam as (
@@ -99,15 +99,16 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and (r122.gr3::int<>1 or r122.gr4::int=2) then 1 
+		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
 		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Начальное общее образование') and license_status <> 'Не действует' then 1
 		when r122.okpo is null and included_in_registr = 1 and edu_level in ('Начальное общее образование') and license_status = 'Не действует' then 0
 		when included_in_registr = 2 then null
+		else 0
 	end as lic_no
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -116,11 +117,11 @@ from org_inf
 	group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
---where r122.okpo is null 
+where r122.str_n::int = 3 and included_in_registr in (1,2)
 )
 select okpo, lic_no
 from pam
-where lic_no is not null
+where lic_no is not null --and lic_no = 1
 --
 
 --statreg7_ron_matched_edu_level lic_oo
@@ -421,8 +422,8 @@ from pam
 where lic_dpo is not null	
 --
 
---
---drop materialized view lic_o
+--drop materialized view registr
+--drop materialized view status_lic_o
 create materialized view status_lic_o as
 --
 with pam as (
@@ -441,7 +442,7 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_1_2_1 r121
 		on org_inf.okpo = r121.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -457,7 +458,7 @@ from pam
 where status_lic_o is not null		
 --
 
-
+--drop materialized view status_lic_dop
 create materialized view status_lic_dop as
 --
 with pam as (
@@ -475,7 +476,7 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
-	join statreg7_ron_matched 
+	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
@@ -509,7 +510,7 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when is_dod = 1 and r2.str_n::int = 1 and (r2.gr3::int = 0 or r2.gr3 is null) then max_gr3 
-		when is_dod = 1 and r2.str_n::int = 1 and r2.gr3 > 0 then r2.gr3
+		when is_dod = 1 and r2.str_n::int = 1 and r2.gr3::int > 0 then r2.gr3
 	end as deti_dod	
 from org_inf 
 	left join razdel_2 r2
@@ -517,7 +518,7 @@ from org_inf
 	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 1
 )
-select okpo, deti_dod
+select count(*)--okpo, deti_dod
 from pam
 where deti_dod is not null	
 --
