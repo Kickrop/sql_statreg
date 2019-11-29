@@ -9,7 +9,8 @@
 --version 2
 with registr as (
 select 
-	s7.pole_1 as kod_okpo 
+	case when s7.pole_1 is not null then s7.pole_1 else oi.okpo end as kod_okpo
+	--s7.pole_1
 	,case when pole_3 is not null then pole_3 else oi.okpo end as id_n --2
 	,oi.okpo as okpo --3
 	,case when pole_2 is not null and length(pole_2) = 8 then pole_2 else left(oi.okpo,8) end as okpo_head 
@@ -18,11 +19,11 @@ select
 	--,pole_8 as inn 
 	,case when pole_8 is not null then pole_8 else noreg_org.noreg_inn end as inn
 	,case when pole_9 is not null and pole_9::int = 1 then 1 else 2 end as org_tip
-	,case when pole_40 is not null and length(pole_40) > 5 then pole_40 else oi.ur_address end as ur_address
+	,case when pole_40 is not null and length(pole_40) > 0 then pole_40 else oi.ur_address end as ur_address
 	,case when pole_41 is not null then pole_41 else oi.phys_address end as phys_address
-	,case when pole_42 is not null and length(pole_42) > 2 then pole_42 else r11.tel end as tel
-	,case when pole_43 is not null and length(pole_43) > 2 then pole_43 else r11.mail end as mail
-	,case when pole_44 is not null and length(pole_44) > 2 then pole_44 else r11.fax end as fax
+	,case when pole_42 is not null then pole_42 else r11.tel end as tel
+	,case when pole_43 is not null and length(pole_43) > 0 then pole_43 else r11.mail end as mail
+	,case when pole_44 is not null and length(pole_44) > 0 then pole_44 else r11.fax end as fax
 	,case when pole_10 is not null then pole_10 else r11.okato_reg end as okato_reg
 	,case when pole_13 is not null and length(pole_13) = 11 then pole_13 else r11.oktmo_reg end as oktmo_reg
 	,case when pole_14 is not null and length(pole_14) = 11 then pole_14 else r11.oktmo_fact end as oktmo_fact
@@ -319,8 +320,8 @@ from
 	left join noreg_org on oi.okpo = noreg_org.okpo
 where included_in_registr in (1,2)		
 )
-select * from registr 
-where included_in_fsn = 2
+select count(okved_main_reg) from registr 
+--where included_in_fsn <> 3
 
 
 --CREATE INDEX idx_ron_match_edu_okpo ON statreg7_ron_matched_edu_level(pole_1);

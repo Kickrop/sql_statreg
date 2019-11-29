@@ -67,10 +67,10 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and (r122.gr3::int<>1 and r122.gr4::int=2) then 0 
-		when r122.okpo is null and edu_level::text in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status <> 'Не действует' then 1
-		when r122.okpo is null and edu_level::text in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and edu_level::text in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status <> 'Не действует' then 1
+		when r122.okpo is null and included_in_registr = 1 and edu_level::text not in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status = 'Не действует' then 0
 		when included_in_registr = 2 then null
-		--else 0
+		else 0
 	end as lic_do 
 from org_inf 
 	left join razdel_1_2_2 r122
@@ -84,9 +84,9 @@ from org_inf
 	group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
---where r122.okpo is null 
+where r122.str_n::int = 2
 )
-select okpo, lic_do
+SELECT okpo, lic_do
 from pam
 where lic_do is not null
 
