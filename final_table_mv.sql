@@ -47,9 +47,9 @@ left join
 where okved_add is not null
 --
 
-select count(distinct pole_1)
-from statreg7_ron_matched_edu_level
-
+--select count(distinct pole_1)
+--from statreg7_ron_matched_edu_level
+--drop materialized view registr
 --statreg7_ron_matched_edu_level lic_do--доработать
 drop materialized view lic_do--!!
 create materialized view lic_do as
@@ -114,7 +114,7 @@ from org_inf
 )
 select okpo, lic_no
 from pam
-where lic_no is not null and lic_no = 1
+where lic_no is not null --and lic_no = 1
 --
 
 --statreg7_ron_matched_edu_level lic_oo
@@ -163,7 +163,6 @@ select --* --count(org_inf.okpo)
 		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Среднее общее образование%' or edu_level like '%Среднее (полное) общее образование%') and license_status <> 'Не действует' then 1
 		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее общее образование','Среднее (полное) общее образование') and license_status = 'Не действует' then 0
 		when included_in_registr = 2 then null
-		else 0
 	end as lic_so
 from org_inf 
 	left join razdel_1_2_2 r122
@@ -185,7 +184,7 @@ where lic_so is not null --and lic_so=1
 ---
 ---
 
-
+drop materialized view lic_spo
 create materialized view lic_spo as --!!
 --
 with pam as (
@@ -219,7 +218,7 @@ from pam
 where lic_spo is not null --and lic_spo=1
 --
 
-
+drop materialized view lic_vo_b 
 create materialized view lic_vo_b as
 --
 with pam as (
@@ -239,9 +238,9 @@ from org_inf
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
-	select okpo_id,array_agg(edu_level)::text as edu_level 
-	from statreg7_ron_matched_edu_level
-	group by okpo_id
+		select okpo_id,array_agg(edu_level)::text as edu_level 
+		from statreg7_ron_matched_edu_level
+		group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
 --where r122.okpo is null 
@@ -252,7 +251,7 @@ where lic_vo_b is not null
 --
 
 
-	
+drop materialized view lic_vo_s	
 create materialized view lic_vo_s as
 --
 with pam as (
@@ -284,7 +283,7 @@ from pam
 where lic_vo_s is not null	
 --
 
-
+drop materialized view lic_vo_m
 create materialized view lic_vo_m as
 --
 with pam as (
@@ -304,19 +303,18 @@ from org_inf
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
-	select okpo_id,array_agg(edu_level)::text as edu_level 
-	from statreg7_ron_matched_edu_level
-	group by okpo_id
+		select okpo_id,array_agg(edu_level)::text as edu_level 
+		from statreg7_ron_matched_edu_level
+		group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
---where r122.okpo is null 
 )
 select okpo, lic_vo_m
 from pam
 where lic_vo_m is not null	
 --
 
-
+drop materialized view lic_vo_kvk
 create materialized view lic_vo_kvk as
 --
 with pam as (
@@ -348,7 +346,7 @@ from pam
 where lic_vo_kvk is not null
 --
 
-	
+drop materialized view lic_po	
 create materialized view lic_po as
 --
 with pam as (
@@ -368,12 +366,11 @@ from org_inf
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
-	select okpo_id,array_agg(edu_level)::text as edu_level 
-	from statreg7_ron_matched_edu_level
-	group by okpo_id
+		select okpo_id,array_agg(edu_level)::text as edu_level 
+		from statreg7_ron_matched_edu_level
+		group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
---where r122.okpo is null 
 )
 select okpo, lic_po
 from pam
@@ -381,7 +378,7 @@ where lic_po is not null
 --
 
 
-
+drop materialized view lic_dpo
 create materialized view lic_dpo as
 --
 with pam as (
@@ -401,9 +398,9 @@ from org_inf
 		on statreg7_ron_matched.okpo_id = org_inf.okpo
 	left join 
 	(
-	select okpo_id,array_agg(edu_level)::text as edu_level 
-	from statreg7_ron_matched_edu_level
-	group by okpo_id
+		select okpo_id,array_agg(edu_level)::text as edu_level 
+		from statreg7_ron_matched_edu_level
+		group by okpo_id
 	) as aokv 
 		on aokv.okpo_id = org_inf.okpo
 --where r122.okpo is null 
@@ -482,9 +479,25 @@ where status_lic_dop is not null
 --
 
 
+--create materialized view deti_dod as 
+--with deti_dod as (
+--select 
+--	r2.okpo,
+--	greatest(sum(case when str_n in (2,3,4) then gr3 else 0 end) --gr3_2_4
+--	,sum(case when str_n in (5,6,7,8,9,10) then gr3 else 0 end)) max_gr3
+--from razdel_2 r2
+--join org_inf oi on oi.okpo=r2.okpo
+--where r2.okpo in (select 
+--		r2.okpo
+--		from razdel_2 r2
+--		join org_inf oi on oi.okpo=r2.okpo
+--		where is_dod = 1 and r2.str_n::int = 1 and (r2.gr3::int = 0 or r2.gr3 is null))
+--group by r2.okpo
+--)
+--select * from deti_dod
+--where max_gr3 > 0
+--
 
-
-	
 	
 create materialized view deti_dod2 as
 --
@@ -501,7 +514,7 @@ from org_inf
 	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 1
 )
-select count(*)--okpo, deti_dod
+select okpo, deti_dod --count(*)--
 from pam
 where deti_dod is not null	
 --
