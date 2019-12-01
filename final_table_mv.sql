@@ -1,4 +1,5 @@
 --okved_add_fact
+drop materialized view okved_add_fact
 create materialized view okved_add_fact as
 select * from (
 select 
@@ -23,6 +24,7 @@ left join
 where okved_add_fact is not null
 
 --okved_add
+drop materialized view okved_add
 create materialized view okved_add as
 select * from (
 select 
@@ -69,14 +71,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 		select okpo_id,array_agg(edu_level)::text as edu_level 
 		from statreg7_ron_matched_edu_level
 		group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.str_n::int = 2 and included_in_registr in (1,2)
 )
 SELECT okpo, lic_do
@@ -102,14 +104,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 	select okpo_id,array_agg(edu_level)::text as edu_level 
 	from statreg7_ron_matched_edu_level
 	group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.str_n::int = 3 and included_in_registr in (1)
 )
 select okpo, lic_no
@@ -135,14 +137,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 	select okpo_id,array_agg(edu_level)::text as edu_level 
 	from statreg7_ron_matched_edu_level
 	group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.okpo is null 
 --where r122.str_n::int = 4 and included_in_registr in (1)
 )
@@ -168,14 +170,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 	select okpo_id,array_agg(edu_level)::text as edu_level 
 	from statreg7_ron_matched_edu_level
 	group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.str_n::int = 5 and included_in_registr in (1)		
 )
 select okpo, lic_so
@@ -185,7 +187,7 @@ where lic_so is not null --and lic_so=1
 ---
 
 drop materialized view lic_spo
-create materialized view lic_spo as --!!
+create materialized view lic_spo as 
 --
 with pam as (
 select --* --count(org_inf.okpo)
@@ -202,14 +204,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
-	join 
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
+	left join 
 	(
 		select okpo_id,array_agg(edu_level)::text as edu_level 
 		from statreg7_ron_matched_edu_level
 		group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = statreg7_ron_matched.okpo_id
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id--on aokv.okpo_id = org_inf.okpo or aokv.pole_1 = org_inf.okpo
 --where included_in_registr in (1)		
 --where r122.okpo is null 
 )
@@ -235,14 +237,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 		select okpo_id,array_agg(edu_level)::text as edu_level 
 		from statreg7_ron_matched_edu_level
 		group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.okpo is null 
 )
 select okpo, lic_vo_b
@@ -268,14 +270,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 	select okpo_id,array_agg(edu_level)::text as edu_level 
 	from statreg7_ron_matched_edu_level
 	group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.okpo is null 
 )
 select okpo, lic_vo_s
@@ -300,14 +302,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 		select okpo_id,array_agg(edu_level)::text as edu_level 
 		from statreg7_ron_matched_edu_level
 		group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 )
 select okpo, lic_vo_m
 from pam
@@ -331,14 +333,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 	select okpo_id,array_agg(edu_level)::text as edu_level 
 	from statreg7_ron_matched_edu_level
 	group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.okpo is null 
 )
 select okpo, lic_vo_kvk
@@ -363,14 +365,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 		select okpo_id,array_agg(edu_level)::text as edu_level 
 		from statreg7_ron_matched_edu_level
 		group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 )
 select okpo, lic_po
 from pam
@@ -395,14 +397,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 		select okpo_id,array_agg(edu_level)::text as edu_level 
 		from statreg7_ron_matched_edu_level
 		group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.okpo is null 
 )
 select okpo, lic_dpo
@@ -410,6 +412,8 @@ from pam
 where lic_dpo is not null	
 --
 
+--select count(*) from razdel_1_2_1 r
+where gr3 is null
 --drop materialized view registr
 --drop materialized view status_lic_o
 create materialized view status_lic_o as
@@ -431,7 +435,7 @@ from org_inf
 	left join razdel_1_2_1 r121
 		on org_inf.okpo = r121.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 )
 select okpo, status_lic_o
 from pam
@@ -457,14 +461,14 @@ from org_inf
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
 	left join statreg7_ron_matched 
-		on statreg7_ron_matched.okpo_id = org_inf.okpo
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 	left join 
 	(
 	select okpo_id,array_agg(edu_level)::text as edu_level 
 	from statreg7_ron_matched_edu_level
 	group by okpo_id
 	) as aokv 
-		on aokv.okpo_id = org_inf.okpo
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.okpo is null 
 )
 select okpo, status_lic_dop
@@ -479,23 +483,23 @@ where status_lic_dop is not null
 --
 
 
---create materialized view deti_dod as 
---with deti_dod as (
---select 
---	r2.okpo,
---	greatest(sum(case when str_n in (2,3,4) then gr3 else 0 end) --gr3_2_4
---	,sum(case when str_n in (5,6,7,8,9,10) then gr3 else 0 end)) max_gr3
---from razdel_2 r2
---join org_inf oi on oi.okpo=r2.okpo
---where r2.okpo in (select 
---		r2.okpo
---		from razdel_2 r2
---		join org_inf oi on oi.okpo=r2.okpo
---		where is_dod = 1 and r2.str_n::int = 1 and (r2.gr3::int = 0 or r2.gr3 is null))
---group by r2.okpo
---)
---select * from deti_dod
---where max_gr3 > 0
+create materialized view deti_dod as 
+with deti_dod as (
+select 
+	r2.okpo,
+	greatest(sum(case when str_n in (2,3,4) then gr3 else 0 end) --gr3_2_4
+	,sum(case when str_n in (5,6,7,8,9,10) then gr3 else 0 end)) max_gr3
+from razdel_2 r2
+join org_inf oi on oi.okpo=r2.okpo
+where r2.okpo in (select 
+		r2.okpo
+		from razdel_2 r2
+		join org_inf oi on oi.okpo=r2.okpo
+		where is_dod = 1 and r2.str_n::int = 1 and (r2.gr3::int = 0 or r2.gr3 is null))
+group by r2.okpo
+)
+select * from deti_dod
+where max_gr3 > 0
 --
 
 	
@@ -533,7 +537,7 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
+--	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 11
 )
 select okpo, dop_ad
@@ -554,7 +558,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 2
 )
 select okpo, dop_dod_raz
@@ -574,7 +577,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 3
 )
 select okpo, dop_dod_is
@@ -596,7 +598,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 4
 )
 select okpo, dop_dod_fs
@@ -616,7 +617,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 5
 )
 select okpo, dop_dod_tn
@@ -637,7 +637,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 6
 )
 select okpo, dop_dod_en
@@ -659,7 +658,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 7
 )
 select okpo, dop_dod_fn
@@ -679,7 +677,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 8
 )
 select okpo, dop_dod_artn
@@ -699,7 +696,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 9
 )
 select okpo, dop_dod_turn
@@ -720,7 +716,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 where r2.str_n::int = 10
 )
 select okpo, dop_dod_socn
@@ -742,7 +737,6 @@ select --* --count(org_inf.okpo)
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 	left join razdel_1_1 r11 on org_inf.okpo=r11.okpo
 --where r2.str_n::int = 11
 )
@@ -751,7 +745,7 @@ from pam
 where dop_dod_adap_raz is not null	
 --
 
-	
+drop materialized view dop_dod_adap_is	
 create materialized view dop_dod_adap_is as
 --
 with pam as (
@@ -759,12 +753,11 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 3 and r2.gr6::int > 0 then 1
-		when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 3 and r2.gr6::int = 0 then 0
+		--when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 3 and r2.gr6::int = 0 then 0
 	end as dop_dod_adap_is
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 	left join razdel_1_1 r11 on org_inf.okpo=r11.okpo
 --where r2.str_n::int = 11
 )
@@ -780,12 +773,11 @@ select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
 		when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 4 and r2.gr6::int > 0 then 1
-		when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 4 and r2.gr6::int = 0 then 0
+		--when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 4 and r2.gr6::int = 0 then 0
 	end as dop_dod_adap_fs
 from org_inf 
 	left join razdel_2 r2
 		on org_inf.okpo = r2.okpo
-	left join deti_dod on org_inf.okpo=deti_dod.okpo
 	left join razdel_1_1 r11 on org_inf.okpo=r11.okpo
 --where r2.str_n::int = 11
 )
@@ -822,5 +814,7 @@ where left(okpo,8) in (select noreg_pole_1 from noreg_org) and status <> '1'
 
 
 --
-
+select *
+from statregistr7 s
+where pole_1 = '52186865'
 	

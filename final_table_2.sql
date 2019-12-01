@@ -17,6 +17,7 @@ select
 	,case when pole_43 is not null and length(pole_43) > 0 then pole_43 else r11.mail end as mail
 	,case when pole_44 is not null and length(pole_44) > 0 then pole_44 else r11.fax end as fax
 	,case when pole_10 is not null then pole_10 else r11.okato_reg end as okato_reg
+	,case when pole_11 is not null then pole_11 else r11.okato_fact end as okato_fact
 	,case when pole_13 is not null and length(pole_13) = 11 then pole_13 else r11.oktmo_reg end as oktmo_reg
 	,case when pole_14 is not null and length(pole_14) = 11 then pole_14 else r11.oktmo_fact end as oktmo_fact
 	,case when pole_24 is not null then pole_24 else noreg_org.noreg_okogu end as okogu
@@ -31,19 +32,19 @@ select
 	,case when pole_119 in ('1','2') then 1 else 0 end as "1dop_2018"
 	,case when included_in_registr = 1 then 1 else null end as lic_o 
 	,case when included_in_registr = 1 then 1 else null end as lic_dop
-	,lic_do.lic_do
-	,lic_no.lic_no
-	,lic_oo
-	,lic_so
-	,lic_spo
-	,lic_vo_b
-	,lic_vo_s
-	,lic_vo_m
-	,lic_vo_kvk	
-	,lic_po	
-	,lic_dpo
-	,status_lic_o
-	,status_lic_dop
+	,case when oi.included_in_registr = 1 and lic_do is not null then lic_do when oi.included_in_registr = 2 then null else 0 end as lic_do
+	,case when oi.included_in_registr = 1 and lic_no is not null then lic_no when oi.included_in_registr = 2 then null else 0 end as lic_no
+	,case when oi.included_in_registr = 1 and lic_oo is not null then lic_oo when oi.included_in_registr = 2 then null else 0 end as lic_oo
+	,case when oi.included_in_registr = 1 and lic_so is not null then lic_so when oi.included_in_registr = 2 then null else 0 end as lic_so
+	,case when oi.included_in_registr = 1 and lic_spo is not null then lic_spo when oi.included_in_registr = 2 then null else 0 end as lic_spo
+	,case when oi.included_in_registr = 1 and lic_vo_b is not null then lic_vo_b when oi.included_in_registr = 2 then null else 0 end as lic_vo_b
+	,case when oi.included_in_registr = 1 and lic_vo_s is not null then lic_vo_s when oi.included_in_registr = 2 then null else 0 end as lic_vo_s
+	,case when oi.included_in_registr = 1 and lic_vo_m is not null then lic_vo_m when oi.included_in_registr = 2 then null else 0 end as lic_vo_m
+	,case when oi.included_in_registr = 1 and lic_vo_kvk is not null then lic_vo_kvk when oi.included_in_registr = 2 then null else 0 end as lic_vo_kvk
+	,case when oi.included_in_registr = 1 and lic_po is not null then lic_po when oi.included_in_registr = 2 then null else 0 end as lic_po
+	,case when oi.included_in_registr = 1 and lic_dpo is not null then lic_dpo when oi.included_in_registr = 2 then null else 0 end as lic_dpo
+	,case when oi.included_in_registr = 1 and status_lic_o is not null then status_lic_o when oi.included_in_registr = 2 then null else 0 end as status_lic_o
+	,case when oi.included_in_registr = 1 and status_lic_dop is not null then status_lic_dop when oi.included_in_registr = 2 then null else 0 end as status_lic_dop	
 	,case when pole_74 is not null then pole_74 else noreg_org.noreg_predpr_type end as predpr_type
 	,case when pole_78 is not null then pole_78 else r11.okved_main_fact end as okved_main_fact
 	,okved_add_fact.okved_add_fact
@@ -84,9 +85,9 @@ select
 		when r11.org_ovz::int = 3 then 13
 		when r11.org_ovz::int = 4 then 20
 	end as org_ovz
-	,dop_dod_adap_raz
-	,dop_dod_adap_is
-	,dop_dod_adap_fs
+	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_raz is not null then dop_dod_adap_raz when oi.included_in_registr = 2 then null else 0 end as dop_dod_adap_raz
+	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_is is not null then dop_dod_adap_is when oi.included_in_registr = 2 then null else 0 end as dop_dod_adap_is
+	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_fs is not null then dop_dod_adap_fs when oi.included_in_registr = 2 then null else 0 end as dop_dod_adap_fs	
 	,case 	
 		when r11.org_izm::int = 3 then 2
 		when r11.org_izm::int = 1 then 1
@@ -148,14 +149,44 @@ from
 	left join noreg_org on oi.okpo = noreg_org.okpo
 where included_in_registr in (1,2)		
 )
-select * from registr 
+select *
+from registr 
+
 --where lic_ron = 0
 --where included_in_fsn <> 3
 
 
 --CREATE INDEX idx_ron_match_edu_okpo ON statreg7_ron_matched_edu_level(pole_1);
+--CREATE INDEX idx_ron_match_edu_okpo ON statreg7_ron_matched_edu_level(pole_1);
+--CREATE INDEX idx_registr_p1 ON statregistr7(pole_1);
+--CREATE INDEX idx_registr_p3 ON statregistr7(pole_3);
+--CREATE INDEX idx_ron_p1 ON statreg7_ron_matched(pole_1);
+--CREATE INDEX idx_ron_okpo_1 ON statreg7_ron_matched(okpo_id);
+--CREATE INDEX idx_ron_edu_okpo_1d ON statreg7_ron_matched_edu_level(okpo_id);
+--CREATE INDEX idx_ron_edu_p1 ON statreg7_ron_matched_edu_level(pole_1);
+--CREATE INDEX idx_ron_oi_okpo ON org_inf(okpo);
+
+
+--alter table org_inf ALTER COLUMN included_in_registr type integer using included_in_registr::int
+--alter table org_inf ALTER COLUMN is_dod type integer using is_dod::int
+--alter table razdel_2 ALTER COLUMN str_n type integer using str_n::int
+--alter table razdel_1_2_2 ALTER COLUMN str_n type integer using str_n::int
+--alter table razdel_1_2_1 ALTER COLUMN str_n type integer using str_n::int
+--alter table razdel_2 ALTER COLUMN gr3 type numeric using gr3::numeric
+--
+--
+--update statregistr7
+--set pole_1 = trim(pole_1)
+--where pole_1=pole_1
+--	
+--
+--update statregistr7
+--set pole_3 = trim(pole_3)
+--where pole_3=pole_3
 
 
 
+--drop table statregistr7 cascade
+DROP MATERIALIZED VIEW statregistr.status_lic_o;
 
 
