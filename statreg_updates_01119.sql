@@ -286,8 +286,8 @@ where okpo='76946369' and str_n = '1'
 
 
 --updates 01/12/2019
---update razdel_1_1
---set okved_main_reg = '85.14'
+update razdel_1_1
+set okved_main_reg = '85.14'
 --select *
 from razdel_1_1
 where okpo = '04650456'
@@ -295,7 +295,10 @@ where okpo = '04650456'
 
 update razdel_1_1
 set okved_main_reg = '85.14'
+select *
+from razdel_1_1
 where okpo = '52186865'
+
 --insert into razdel_1_1 values ('52186865',null)
 select *
 delete
@@ -325,21 +328,18 @@ where okpo = '39422740'
 
 update razdel_1_1
 set okved_main_reg = '85.11'
---select *
---from razdel_1_1 r
+--select * from razdel_1_1 r
 where okpo = '53250273'
 --
 
 update additional_okved
 set gr4_okved_add = '85.41'
---select *
-from additional_okved r
+--select * from additional_okved r
 where okpo = '39422740' and str_n = '2' and n_okved_add = '1'
 --
 
 insert into additional_okved values ('53250273','2','2','85.41')
---select *
-from additional_okved r
-where okpo = '53250273' and str_n = '2' and n_okved_add = '1'
+--select * from additional_okved r
+where okpo = '53250273' and str_n = '2' and n_okved_add = '2'
 
 
