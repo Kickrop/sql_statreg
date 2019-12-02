@@ -13,9 +13,9 @@ select
 	,case when pole_9 is not null and pole_9::int = 1 then 1 else 2 end as org_tip
 	,case when pole_40 is not null and length(pole_40) > 0 then pole_40 else oi.ur_address end as ur_address
 	,case when pole_41 is not null then pole_41 else oi.phys_address end as phys_address
-	,case when pole_42 is not null then pole_42 else r11.tel end as tel
-	,case when pole_43 is not null and length(pole_43) > 0 then pole_43 else r11.mail end as mail
-	,case when pole_44 is not null and length(pole_44) > 0 then pole_44 else r11.fax end as fax
+	,case when pole_42 is not null then pole_42 when r11.tel <> '9999' then r11.tel else null end as tel
+	,case when pole_43 is not null and length(pole_43) > 0 then pole_43 when r11.mail <> '9999' then r11.mail else null end as mail
+	,case when pole_44 is not null and length(pole_44) > 0 then pole_44 when r11.fax <> '9999' then r11.fax else null end as fax
 	,case when pole_10 is not null then pole_10 else r11.okato_reg end as okato_reg
 	,case when pole_11 is not null then pole_11 else r11.okato_fact end as okato_fact
 	,case when pole_13 is not null and length(pole_13) = 11 then pole_13 else r11.oktmo_reg end as oktmo_reg
