@@ -1,5 +1,5 @@
 --drop materialized view statregistr.registr
-create materialized view statregistr.registr as
+--create materialized view statregistr.registr as
 --version 2
 with registr as (
 select 
@@ -7,8 +7,18 @@ select
 	,case when pole_3 is not null then pole_3 else oi.okpo end as id_n --2
 	,oi.okpo as okpo --3
 	,case when pole_2 is not null and length(pole_2) = 8 then pole_2 else left(oi.okpo,8) end as okpo_head 
-	,case when pole_6 is not null then pole_6 else oi.short_name end as short_name 
-	,case when pole_7 is not null then pole_7 else oi.full_name end as full_name
+	--,case when pole_6 is not null then pole_6 else oi.short_name end as short_name 
+	,case 	
+		when left(pole_6,5) like '%85-К%' then trim(substring(pole_6,5)) 
+		else pole_6
+	end	short_name
+	--,case when pole_7 is not null then pole_7 else oi.full_name end as full_name
+	,case 	
+		when pole_7 like '%Группы кратковременного пребывания%' then trim(substring(pole_7,40)) 
+		when left(pole_7,5) like '%85-К%' then trim(substring(pole_7,5)) 
+		when pole_7 is not null then pole_7
+		else oi.full_name
+	end as full_name
 	,case when pole_8 is not null then pole_8 else noreg_org.noreg_inn end as inn
 	,case when pole_9 is not null and pole_9::int = 1 then 1 else 2 end as org_tip
 	,case when pole_40 is not null and length(pole_40) > 0 then pole_40 else oi.ur_address end as ur_address
@@ -149,8 +159,9 @@ from
 	left join noreg_org on oi.okpo = noreg_org.okpo
 where included_in_registr in (1,2)		
 )
-select *
+select count(*)
 from registr 
+--where left(short_name,5) like '%85-К%'
 
 --where lic_ron = 0
 --where included_in_fsn <> 3
