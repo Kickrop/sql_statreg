@@ -10,7 +10,8 @@ select
 	--,case when pole_6 is not null then pole_6 else oi.short_name end as short_name 
 	,case 	
 		when left(pole_6,5) like '%85-Ê%' then trim(substring(pole_6,5)) 
-		else pole_6
+		when pole_6 is not null pole_6
+		else oi.short_name
 	end	short_name
 	--,case when pole_7 is not null then pole_7 else oi.full_name end as full_name
 	,case 	
