@@ -187,6 +187,6 @@ from registr
 
 
 --drop table statregistr7 cascade
-DROP MATERIALIZED VIEW statregistr.status_lic_o;
+--DROP MATERIALIZED VIEW statregistr.status_lic_o;
 
 

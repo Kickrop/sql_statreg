@@ -120,7 +120,7 @@ where lic_no is not null --and lic_no = 1
 --
 
 --statreg7_ron_matched_edu_level lic_oo
---drop materialized view lic_oo !!
+--drop materialized view lic_oo 
 create materialized view lic_oo as
 --
 with pam as (
@@ -482,7 +482,7 @@ where status_lic_dop is not null
 --where gr5 like ''
 --
 
-
+drop materialized view deti_dod
 create materialized view deti_dod as 
 with deti_dod as (
 select 
@@ -502,7 +502,7 @@ select * from deti_dod
 where max_gr3 > 0
 --
 
-	
+drop materialized view deti_dod2
 create materialized view deti_dod2 as
 --
 with pam as (
@@ -523,7 +523,7 @@ from pam
 where deti_dod is not null	
 --
 
-
+drop materialized view dop_ad as
 create materialized view dop_ad as
 --
 with pam as (
@@ -545,6 +545,7 @@ from pam
 where dop_ad is not null		
 --
 
+drop materialized view dop_dod_raz
 create materialized view dop_dod_raz as
 --
 with pam as (
@@ -565,6 +566,7 @@ from pam
 where dop_dod_raz is not null	
 --
 
+drop materialized view dop_dod_is
 create materialized view dop_dod_is as
 --
 with pam as (
@@ -584,7 +586,7 @@ from pam
 where dop_dod_is is not null	
 --
 
-
+drop materialized view dop_dod_fs
 create materialized view dop_dod_fs as
 --
 with pam as (
@@ -605,6 +607,8 @@ from pam
 where dop_dod_fs is not null	
 ---
 ---
+
+drop materialized view dop_dod_tn
 create materialized view dop_dod_tn as
 --
 with pam as (
@@ -624,7 +628,7 @@ from pam
 where dop_dod_tn is not null
 --
 
-
+drop materialized view dop_dod_en
 create materialized view dop_dod_en as
 --
 with pam as (
@@ -645,7 +649,7 @@ where dop_dod_en is not null
 --
 
 
-	
+drop materialized view dop_dod_fn	
 create materialized view dop_dod_fn as
 --
 with pam as (
@@ -665,6 +669,7 @@ from pam
 where dop_dod_fn is not null	
 ---
 
+drop materialized view dop_dod_artn
 create materialized view dop_dod_artn as
 --
 with pam as (
@@ -684,6 +689,7 @@ from pam
 where dop_dod_artn is not null
 --
 
+drop materialized view dop_dod_turn
 create materialized view dop_dod_turn as
 --
 with pam as (
@@ -703,7 +709,7 @@ from pam
 where dop_dod_turn is not null
 --
 	
-
+drop materialized view dop_dod_socn
 create materialized view dop_dod_socn as
 --
 with pam as (
@@ -766,6 +772,7 @@ from pam
 where dop_dod_adap_is is not null	
 ---
 
+drop materialized view dop_dod_adap_fs
 create materialized view dop_dod_adap_fs as
 --
 with pam as (
@@ -786,6 +793,7 @@ from pam
 where dop_dod_adap_fs is not null	
 --
 --
+
 --drop materialized view noreg_org
 create materialized view noreg_org as
 select 
