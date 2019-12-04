@@ -1,5 +1,5 @@
 --drop materialized view statregistr.registr
---create materialized view statregistr.registr as
+create materialized view statregistr.registr as
 --version 2
 with registr as (
 select 
@@ -9,14 +9,14 @@ select
 	,case when pole_2 is not null and length(pole_2) = 8 then pole_2 else left(oi.okpo,8) end as okpo_head 
 	--,case when pole_6 is not null then pole_6 else oi.short_name end as short_name 
 	,case 	
-		when left(pole_6,5) like '%85-К%' then trim(substring(pole_6,5)) 
-		when pole_6 is not null pole_6
+		when left(pole_6,5) like '%85-К%' or left(pole_6,5) like '%85-к%' then trim(substring(pole_6,5)) 
+		when pole_6 is not null then pole_6
 		else oi.short_name
 	end	short_name
 	--,case when pole_7 is not null then pole_7 else oi.full_name end as full_name
 	,case 	
 		when pole_7 like '%Группы кратковременного пребывания%' then trim(substring(pole_7,40)) 
-		when left(pole_7,5) like '%85-К%' then trim(substring(pole_7,5)) 
+		when left(pole_7,5) like '%85-К%' or left(pole_7,5) like '%85-к%' then trim(substring(pole_7,5)) 
 		when pole_7 is not null then pole_7
 		else oi.full_name
 	end as full_name
@@ -37,10 +37,10 @@ select
 	,case when pole_27 is not null then pole_27 else noreg_org.noreg_ogrn end as ogrn
 	,case when pole_21 is not null then pole_21 else r11.okved_main_reg end as okved_main_reg
 	,okved_add.okved_add
-	,case when pole_116 in ('1','2') then 1 else 0 end as "1dop_2015-2018" 
-	,case when pole_117 in ('1','2') then 1 else 0 end as "1dop_2016"
-	,case when pole_118 in ('1','2') then 1 else 0 end as "1dop_2017"
-	,case when pole_119 in ('1','2') then 1 else 0 end as "1dop_2018"
+	,case when pole_117 in ('1','2') or oi."1dop2018" = '1' then 1 else 0 end as "1dop_2015-2018" 
+	,case when pole_118 in ('1','2') then 1 else 0 end as "1dop_2016"
+	,case when pole_119 in ('1','2') then 1 else 0 end as "1dop_2017"
+	,case when oi."1dop2018" in ('1') then 1 else 0 end as "1dop_2018"
 	,case when included_in_registr = 1 then 1 else null end as lic_o 
 	,case when included_in_registr = 1 then 1 else null end as lic_dop
 	,case when oi.included_in_registr = 1 and lic_do is not null then lic_do when oi.included_in_registr = 2 then null else 0 end as lic_do
@@ -160,7 +160,7 @@ from
 	left join noreg_org on oi.okpo = noreg_org.okpo
 where included_in_registr in (1,2)		
 )
-select count(*)
+select *
 from registr 
 --where left(short_name,5) like '%85-К%'
 
