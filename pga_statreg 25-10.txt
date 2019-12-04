@@ -1,0 +1,218 @@
+select count(*)
+from statregistr._0_statregistr7 as a
+join statregistr._0_statregistr7_plus1 as b on a.pole_1=b.pole_1 and a.pole_2=b.pole_2 --and a.pole_3=b.pole_3 and a.pole_4=b.pole_4 --and a.pole_7=b.pole_7
+
+
+select * from statregistr.statreg7_ron_matched --._0_statregistr7_plus1
+where pole_1 = '02372800'
+
+select *, count(inn  || ogrn || fullname || address)
+from (
+select inn,ogrn,fullname,address
+--select source,fullname, shortname, branch,org_type,inn,ogrn,kpp,region,address,license_status,license_authority,license_number,license_issue_date,validity
+	from statregistr.statreg7_ron_matched
+	where head = 'H'
+	group by source,fullname, shortname, branch,org_type,inn,ogrn,kpp,region,address,license_status,license_authority,license_number,license_issue_date,validity
+) x
+group by inn,ogrn,fullname,address
+having count(inn  || ogrn || fullname || address) > 1
+
+group by source,fullname, shortname, branch,org_type,inn,ogrn,kpp,region,address,license_status,license_authority,license_number,license_issue_date,validity
+having count(*) > 1
+	
+	group by pole_1
+	having count(inn || ogrn || fullname || address) > 6
+--создать табличку на базе мв
+--drop table statregistr.statreg7_ron_match
+create table statregistr.statreg7_ron_match as
+--select distinct pole_1 
+--from
+--(
+	select head,pole_1,source,fullname, shortname, branch,org_type,inn,ogrn,kpp,region,address,license_status,license_authority,license_number,license_issue_date,validity, array_agg(edu_level) as edu_level,is_deleted
+	from statregistr.statreg7_ron_matched
+	--where head = 'H' --and is_deleted = '0'
+group by head,pole_1,source,fullname, shortname, branch,org_type,inn,ogrn,kpp,region,address,license_status,license_authority,license_number,license_issue_date,validity,is_deleted
+--) x
+group by pole_1
+having count(pole_1) > 1
+ALTER TABLE statregistr.statreg7_ron_match ADD COLUMN id SERIAL
+ALTER TABLE statregistr.statreg7_ron_match DROP COLUMN id
+CREATE INDEX idx_statreg7_ron_match_pole_1 ON statregistr.statreg7_ron_match(pole_1)
+--проверить и удалить дубликаты
+	select count(pole_1)--pole_1,inn,ogrn,fullname,address,count(inn || ogrn || fullname || address)
+	from statregistr.statreg7_ron_match
+	where head = 'F' --and is_deleted = '0'
+	group by pole_1,inn,ogrn,fullname,address
+	having count(inn || ogrn || fullname || address) > 1
+	
+	delete from
+	statregistr.statreg7_ron_match a using statregistr.statreg7_ron_match b
+	where a.head = 'F' and a.id<b.id and a.inn=b.inn and a.ogrn=b.ogrn and a.fullname=b.fullname and a.address=b.address
+--создать табличку с уровнями
+create table statregistr.statreg7_ron_matched_edu_level as
+select pole_1,unnest(edu_level) as edu_level
+from statregistr.statreg7_ron_match
+--
+select *
+from statregistr.statreg7_ron_match
+where inn = '1658207292'
+--
+select pole_1, inn,ogrn,fullname,address
+from statregistr.statreg7_ron_matched
+where head = 'H'
+group by pole_1, inn,ogrn,fullname,address
+having count(inn || ogrn || fullname || address) > 1
+--
+select distinct inn,ogrn,fullname,address 
+	from statregistr.statreg7_ron_matched
+	where head = 'H'
+
+select count(*) from (select distinct inn,ogrn,fullname from statregistr.statreg7_ron_matched where head = 'H') x
+
+
+--drop materialized view statregistr._0_statregistr7_plus1
+create materialized view statregistr._0_statregistr7_plus1 as
+with  osn2 as (
+       select replace("1", '_', '') as pole_1,
+              replace("2", '_', '') as pole_2,
+              replace("3", '_', '') as pole_3,
+              replace("4", '_', '') as pole_4,
+              "7" as pole_7,
+              "28" as pole_28,
+              "29" as pole_29,
+              "30" as pole_30,
+              "31" as pole_31,
+              "32" as pole_32,
+              "33" as pole_33,
+              "34" as pole_34,
+              "35" as pole_35,
+              "36" as pole_36,
+              "37" as pole_37,
+              "38" as pole_38,
+              "39" as pole_39,
+              "40" as pole_40,
+              "41" as pole_41,
+              "42" as pole_42,
+              "43" as pole_43,
+              "44" as pole_44,
+              "45" as pole_45,
+              "46" as pole_46,
+              "47" as pole_47,
+              "48" as pole_48,
+              "49" as pole_49,
+              "50" as pole_50,
+              "51" as pole_51,
+              "52" as pole_52,
+              "53" as pole_53,
+              "54" as pole_54,
+              "55" as pole_55,
+              "66" as pole_66,
+              "75" as pole_75,
+              "80" as pole_80,
+              "81" as pole_81,
+              "82" as pole_82,
+              "83" as pole_83,
+              "93" as pole_93,
+              "94" as pole_94,
+              "97" as pole_97,
+              "106" as pole_106,
+              "112" as pole_112,
+              "115" as pole_115
+       from get_google_table_v2(
+                'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8doFQwdiRxuCn7si-QnJ5y8DA7S_DwYXOnruuu0Sl5cp1EUdOg1GoUtaMekYBUkp1sUs8qE9t30F-/pub?gid=1225779298&single=true&output=csv'::text) a("1" varchar(20), "2" varchar(20), "3" varchar(20), "4" text, "7" text, "28" text, "29" text, "30" text, "31" text, "32" text, "33" text, "34" text, "35" text, "36" text, "37" text, "38" text, "39" text, "40" text, "41" text, "42" text, "43" text, "44" text, "45" text, "46" text, "47" text, "48" text, "49" text, "50" text, "51" text, "52" text, "53" text, "54" text, "55" text, "66" text, "75" text, "80" text, "81" text, "82" text, "83" text, "93" text, "94" text, "97" text, "106" text, "112" text, "115" text)
+     )
+select 
+			  "1" as pole_1,
+              "2" as pole_2,
+              "3" as pole_3,
+              "4" as pole_4,
+              "7" as pole_7,
+              "28" as pole_28,
+              "29" as pole_29,
+              "30" as pole_30,
+              "31" as pole_31,
+              "32" as pole_32,
+              "33" as pole_33,
+              "34" as pole_34,
+              "35" as pole_35,
+              "36" as pole_36,
+              "37" as pole_37,
+              "38" as pole_38,
+              "39" as pole_39,
+              "40" as pole_40,
+              "41" as pole_41,
+              "42" as pole_42,
+              "43" as pole_43,
+              "44" as pole_44,
+              "45" as pole_45,
+              "46" as pole_46,
+              "47" as pole_47,
+              "48" as pole_48,
+              "49" as pole_49,
+              "50" as pole_50,
+              "51" as pole_51,
+              "52" as pole_52,
+              "53" as pole_53,
+              "54" as pole_54,
+              "55" as pole_55,
+              "66" as pole_66,
+              "75" as pole_75,
+              "80" as pole_80,
+              "81" as pole_81,
+              "82" as pole_82,
+              "83" as pole_83,
+              "93" as pole_93,
+              "94" as pole_94,
+              "97" as pole_97,
+              "106" as pole_106,
+              "112" as pole_112,
+              "115" as pole_115
+ from statregistr.statregistr6_plus1 where "1" != '08014734'
+union
+select
+			  pole_1,
+              pole_2,
+              pole_3,
+              pole_4,
+              pole_7,
+              pole_28,
+              pole_29,
+              pole_30,
+              pole_31,
+              pole_32,
+              pole_33,
+              pole_34,
+              pole_35,
+              pole_36,
+              pole_37,
+              pole_38,
+              pole_39,
+              pole_40,
+              pole_41,
+              pole_42,
+              pole_43,
+              pole_44,
+              pole_45,
+              pole_46,
+              pole_47,
+              pole_48,
+              pole_49,
+              pole_50,
+              pole_51,
+              pole_52,
+              pole_53,
+              pole_54,
+              pole_55,
+              pole_66,
+              pole_75,
+              pole_80,
+              pole_81,
+              pole_82,
+              pole_83,
+              pole_93,
+              pole_94,
+              pole_97,
+              pole_106,
+              pole_112,
+              pole_115
+from osn2;
