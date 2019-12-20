@@ -48,7 +48,10 @@ left join
 ) x
 where okved_add is not null
 --
-
+select lic_ron,count(*)
+from registr
+where registr.included_in_fsn in (3)
+group by lic_ron
 --select count(distinct pole_1)
 --from statreg7_ron_matched_edu_level
 --drop materialized view registr
@@ -60,9 +63,9 @@ with pam as (
 select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
+		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and (r122.gr3::int<>1 and r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status <> 'Не действует' then 1
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status not like '%Не действует%' then 2
 		--when r122.okpo is null and included_in_registr = 1 and edu_level::text not in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status = 'Не действует' then 0
 		--when included_in_registr = 2 then null
 		--else 0
@@ -81,9 +84,39 @@ from org_inf
 		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.str_n::int = 2 and included_in_registr in (1,2)
 )
-SELECT okpo, lic_do
+SELECT *--okpo, lic_do
 from pam
-where lic_do is not null --and lic_do=1
+where lic_do = 2
+--		select count(*) from pam
+--		where lic_do = 2
+--		--and lic_do=1
+
+select count(*)
+from org_inf
+left join razdel_1_2_2 r122
+		on org_inf.okpo = r122.okpo 
+where included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2		
+
+--from statreg7_ron_matched
+--join statreg7_ron_matched_edu_level on statreg7_ron_matched_edu_level.okpo_id=statreg7_ron_matched.okpo_id
+--left join (select org_inf.okpo from razdel_1_2_2 join org_inf on org_inf.okpo=razdel_1_2_2.okpo) rr on rr.okpo=statreg7_ron_matched.okpo_id
+--where rr.okpo is null
+--and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status not like '%Не действует%'
+select count(org_inf.okpo) 
+from org_inf join statregistr7 s7 on org_inf.okpo = s7.pole_1 or org_inf.okpo = s7.pole_3
+where s7.pole_21 like '%85.41%' --or s7.pole_21 like ''
+
+select count(*)
+from statregistr7 s
+join org_inf on org_inf.okpo=s.pole_1 or org_inf.okpo=s.pole_3
+where --org_type_p21 = '01' and 
+pole_21 like '%85.41%' and
+org_inf.included_in_registr = '1'
+--group by org_type_p21
+--and s.in_vyborka = '1'
+select count(*)
+from registr r
+where r.org_type = '01'
 
 --statreg7_ron_matched_edu_level lic_no
 drop materialized view lic_no --!!
@@ -605,6 +638,7 @@ where r2.str_n::int = 4
 select okpo, dop_dod_fs
 from pam
 where dop_dod_fs is not null	
+
 ---
 ---
 
@@ -788,11 +822,43 @@ from org_inf
 	left join razdel_1_1 r11 on org_inf.okpo=r11.okpo
 --where r2.str_n::int = 11
 )
-select okpo, dop_dod_adap_fs
+--select okpo, dop_dod_adap_fs
+--from pam
+--where dop_dod_adap_fs is not null	
+select count(*)
 from pam
-where dop_dod_adap_fs is not null	
+where dop_dod_adap_fs = 1	
 --
---
+--pustota
+with pam as (
+select count(org_inf.okpo)
+	--org_inf.okpo
+	--,case 
+		--when included_in_registr = 2 or r2 is null then 1
+		--when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 4 and r2.gr6::int = 0 then 0
+	--end as dop_dod_adap_fs
+from org_inf 
+	 join razdel_2 r2
+		on org_inf.okpo = r2.okpo
+	 join razdel_1_1 r11 on org_inf.okpo=r11.okpo
+--where r2.str_n::int = 11
+where included_in_registr = 1 and is_dod = 1 and r2.str_n::int = 4 and (r2.gr6::int = 0 or r2.gr6 is null) or 
+(r11.org_ovz::int in (1,2,3))
+)
+--select okpo, dop_dod_adap_fs
+--from pam
+--where dop_dod_adap_fs is not null	
+select count(distinct okpo)
+from pam
+where dop_dod_adap_fs 
+
+select count(*)
+from org_inf 
+where included_in_registr = 1 and
+report between 2 and 10
+
+select distinct report from org_inf
+
 
 --drop materialized view noreg_org
 create materialized view noreg_org as

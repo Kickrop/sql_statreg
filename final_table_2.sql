@@ -54,8 +54,8 @@ select
 	,case when oi.included_in_registr = 1 and lic_vo_kvk is not null then lic_vo_kvk when oi.included_in_registr = 2 then null else 0 end as lic_vo_kvk
 	,case when oi.included_in_registr = 1 and lic_po is not null then lic_po when oi.included_in_registr = 2 then null else 0 end as lic_po
 	,case when oi.included_in_registr = 1 and lic_dpo is not null then lic_dpo when oi.included_in_registr = 2 then null else 0 end as lic_dpo
-	,case when oi.included_in_registr = 1 and status_lic_o is not null then status_lic_o when oi.included_in_registr = 2 then null else 0 end as status_lic_o
-	,case when oi.included_in_registr = 1 and status_lic_dop is not null then status_lic_dop when oi.included_in_registr = 2 then null else 0 end as status_lic_dop	
+	,case when oi.included_in_registr = 1 and status_lic_o is not null then status_lic_o when oi.included_in_registr = 2 then null else null end as status_lic_o
+	,case when oi.included_in_registr = 1 and status_lic_dop is not null then status_lic_dop when oi.included_in_registr = 2 then null else null end as status_lic_dop	
 	,case when pole_74 is not null then pole_74 else noreg_org.noreg_predpr_type end as predpr_type
 	,case when pole_78 is not null then pole_78 else r11.okved_main_fact end as okved_main_fact
 	,okved_add_fact.okved_add_fact
@@ -96,9 +96,9 @@ select
 		when r11.org_ovz::int = 3 then 13
 		when r11.org_ovz::int = 4 then 20
 	end as org_ovz
-	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_raz is not null then dop_dod_adap_raz when oi.included_in_registr = 2 then null else 0 end as dop_dod_adap_raz
-	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_is is not null then dop_dod_adap_is when oi.included_in_registr = 2 then null else 0 end as dop_dod_adap_is
-	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_fs is not null then dop_dod_adap_fs when oi.included_in_registr = 2 then null else 0 end as dop_dod_adap_fs	
+	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_raz is not null then dop_dod_adap_raz when oi.included_in_registr = 2 or r2 is null then null else 0 end as dop_dod_adap_raz
+	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_is is not null then dop_dod_adap_is when oi.included_in_registr = 2 or r2 is null then null else 0 end as dop_dod_adap_is
+	,case when oi.included_in_registr = 1 and r2 is not null and dop_dod_adap_fs is not null then dop_dod_adap_fs when oi.included_in_registr = 2 or r2 is null then null else 0 end as dop_dod_adap_fs	
 	,case 	
 		when r11.org_izm::int = 3 then 2
 		when r11.org_izm::int = 1 then 1
@@ -160,8 +160,10 @@ from
 	left join noreg_org on oi.okpo = noreg_org.okpo
 where included_in_registr in (1,2)		
 )
-select *
+select --*
+dop_dod_adap_raz,count(*)
 from registr 
+group by dop_dod_adap_raz
 --where left(short_name,5) like '%85-Ê%'
 
 --where lic_ron = 0
@@ -201,4 +203,11 @@ from registr
 --drop table statregistr7 cascade
 --DROP MATERIALIZED VIEW statregistr.status_lic_o;
 
+select dop_dod_adap_fs,count(okpo) from dop_dod_adap_fs
+group by dop_dod_adap_fs
 
+select count(okpo) from dop_dod_adap_fs
+where dop_dod_adap_fs is null
+
+
+select count(distinct okpo) from razdel_2 r
