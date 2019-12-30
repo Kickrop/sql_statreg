@@ -55,7 +55,7 @@ group by lic_ron
 --select count(distinct pole_1)
 --from statreg7_ron_matched_edu_level
 --drop materialized view registr
---statreg7_ron_matched_edu_level lic_do--доработать
+--statreg7_ron_matched_edu_level lic_do
 drop materialized view lic_do--!!
 create materialized view lic_do as
 --
@@ -63,12 +63,12 @@ with pam as (
 select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
-		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and (r122.gr3::int<>1 and r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status not like '%Не действует%' then 2
-		--when r122.okpo is null and included_in_registr = 1 and edu_level::text not in ('Дошкольное образование','Дополнительное дошкольное образование') and license_status = 'Не действует' then 0
-		--when included_in_registr = 2 then null
-		--else 0
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
+		
+		--when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р”РѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РґРѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status not like '%РќРµ РґРµР№СЃС‚РІСѓРµС‚%' then 1
+		when (r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2) or		
+		(included_in_registr = 1 and (edu_level like '%Р”РѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РґРѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status not like '%РќРµ РґРµР№СЃС‚РІСѓРµС‚%') then 1
+
 	end as lic_do 
 from org_inf 
 	left join razdel_1_2_2 r122
@@ -84,12 +84,56 @@ from org_inf
 		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.str_n::int = 2 and included_in_registr in (1,2)
 )
-SELECT *--okpo, lic_do
+SELECT distinct okpo, lic_do --count(distinct okpo) --
 from pam
-where lic_do = 2
---		select count(*) from pam
---		where lic_do = 2
---		--and lic_do=1
+where lic_do is not null 
+--full join query_lic_do_accb on pam.okpo=query_lic_do_accb.п»їokpo
+--where lic_do is not null and okpo not in (select * from query_lic_do_accb) --(pam.okpo is null or query_lic_do_accb.п»їokpo is null)
+
+select d --count(distinct п»їokpo)
+from query_lic_do_accb
+where п»їokpo not in (select okpo from lic_do)
+
+select *
+from razdel_1_2_2 r
+where r.okpo = '00792969'
+
+--try
+with pam as (
+select --* --count(org_inf.okpo)
+	org_inf.okpo
+	,case 
+		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 2 and (r122.gr3::int<>1 and r122.gr4::int=2) then 0 
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р”РѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РґРѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status not like '%РќРµ РґРµР№СЃС‚РІСѓРµС‚%' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level::text not in ('Р”РѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ','Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РґРѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
+		--when included_in_registr = 2 then null
+		--else 0
+	end as lic_do 
+from org_inf 
+	left join razdel_1_2_2 r122
+		on org_inf.okpo = r122.okpo
+	left join statreg7_ron_matched 
+		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
+	left join 
+	(
+--		select okpo_id,array_agg(edu_level)::text as edu_level 
+--		from statreg7_ron_matched_edu_level
+--		group by okpo_id
+		select *
+		from statreg7_ron_matched_edu_level
+	) as aokv 
+		on aokv.okpo_id = statreg7_ron_matched.okpo_id
+--where r122.str_n::int = 2 and included_in_registr in (1,2)
+)
+SELECT * --distinct okpo --okpo, lic_do
+from pam
+where lic_do is not null
+
+select * 
+from razdel_1_2_2
+where okpo = '43450431'
+
 
 select count(*)
 from org_inf
@@ -101,7 +145,7 @@ where included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r1
 --join statreg7_ron_matched_edu_level on statreg7_ron_matched_edu_level.okpo_id=statreg7_ron_matched.okpo_id
 --left join (select org_inf.okpo from razdel_1_2_2 join org_inf on org_inf.okpo=razdel_1_2_2.okpo) rr on rr.okpo=statreg7_ron_matched.okpo_id
 --where rr.okpo is null
---and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status not like '%Не действует%'
+--and (edu_level like '%Р”РѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РґРѕС€РєРѕР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status not like '%РќРµ РґРµР№СЃС‚РІСѓРµС‚%'
 select count(org_inf.okpo) 
 from org_inf join statregistr7 s7 on org_inf.okpo = s7.pole_1 or org_inf.okpo = s7.pole_3
 where s7.pole_21 like '%85.41%' --or s7.pole_21 like ''
@@ -126,12 +170,10 @@ with pam as (
 select --* --count(org_inf.okpo)
 	org_inf.okpo
 	,case 
-		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
-		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and edu_level like ('%Начальное общее образование%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Начальное общее образование') and license_status = 'Не действует' then 0
-		--when included_in_registr = 2 then null
-		--else 0
+		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
+		--when r122.okpo is null and included_in_registr = 1 and edu_level like ('%РќР°С‡Р°Р»СЊРЅРѕРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status not like '%РќРµ РґРµР№СЃС‚РІСѓРµС‚%' then 1
+		when (r122.okpo is not null and included_in_registr = 1 and r122.str_n = 3 and r122.gr3::int=1 and r122.gr4::int<>2) or
+	    (included_in_registr = 1 and edu_level like ('%РќР°С‡Р°Р»СЊРЅРѕРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status not like '%РќРµ РґРµР№СЃС‚РІСѓРµС‚%') then 1
 	end as lic_no
 from org_inf 
 	left join razdel_1_2_2 r122
@@ -147,9 +189,9 @@ from org_inf
 		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.str_n::int = 3 and included_in_registr in (1)
 )
-select okpo, lic_no
+select count(distinct okpo) --okpo, lic_no
 from pam
-where lic_no is not null --and lic_no = 1
+where lic_no = 1 --lic_no is not null --and lic_no = 1
 --
 
 --statreg7_ron_matched_edu_level lic_oo
@@ -162,8 +204,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 4 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 4 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Основное общее образование%' or edu_level like '%Дополнительное основное общее образование%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Основное общее образование','Дополнительное основное общее образование') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%РћСЃРЅРѕРІРЅРѕРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕСЃРЅРѕРІРЅРѕРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('РћСЃРЅРѕРІРЅРѕРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ','Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕСЃРЅРѕРІРЅРѕРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		--else 0
 	end as lic_oo	
 from org_inf 
@@ -195,8 +237,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when included_in_registr = 1 and r122.str_n = 5 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
 		--when included_in_registr = 1 and r122.str_n = 5 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Среднее общее образование%' or edu_level like '%Среднее (полное) общее образование%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее общее образование','Среднее (полное) общее образование') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%РЎСЂРµРґРЅРµРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or edu_level like '%РЎСЂРµРґРЅРµРµ (РїРѕР»РЅРѕРµ) РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('РЎСЂРµРґРЅРµРµ РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ','РЎСЂРµРґРЅРµРµ (РїРѕР»РЅРѕРµ) РѕР±С‰РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		when included_in_registr = 2 then null
 	end as lic_so
 from org_inf 
@@ -228,8 +270,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 6 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
 		--when included_in_registr = 1 and r122.str_n = 6 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Среднее профессиональное образование%' or edu_level like '%Начальное профессиональное образование%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Среднее профессиональное образование','Начальное профессиональное образование') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%РЎСЂРµРґРЅРµРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or edu_level like '%РќР°С‡Р°Р»СЊРЅРѕРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('РЎСЂРµРґРЅРµРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ','РќР°С‡Р°Р»СЊРЅРѕРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		--when included_in_registr = 2 then null
 		--when included_in_registr = 1 then 0
 	end as lic_spo
@@ -262,8 +304,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when included_in_registr = 1 and r122.str_n = 7 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
 		--when included_in_registr = 1 and r122.str_n = 7 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - Бакалавриат%' or edu_level like '%Высшее образование - бакалавриат%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Бакалавриат','Высшее образование - бакалавриат') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р’Рћ - Р‘Р°РєР°Р»Р°РІСЂРёР°С‚%' or edu_level like '%Р’С‹СЃС€РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ - Р±Р°РєР°Р»Р°РІСЂРёР°С‚%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Р’Рћ - Р‘Р°РєР°Р»Р°РІСЂРёР°С‚','Р’С‹СЃС€РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ - Р±Р°РєР°Р»Р°РІСЂРёР°С‚') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		--when included_in_registr = 2 then null
 	end as lic_vo_b
 from org_inf 
@@ -295,8 +337,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when included_in_registr = 1 and r122.str_n = 8 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
 		--when included_in_registr = 1 and r122.str_n = 8 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - Специалитет%' or edu_level like '%Высшее образование - специалитет%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Специалитет','Высшее образование - специалитет') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р’Рћ - РЎРїРµС†РёР°Р»РёС‚РµС‚%' or edu_level like '%Р’С‹СЃС€РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ - СЃРїРµС†РёР°Р»РёС‚РµС‚%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Р’Рћ - РЎРїРµС†РёР°Р»РёС‚РµС‚','Р’С‹СЃС€РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ - СЃРїРµС†РёР°Р»РёС‚РµС‚') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		--when included_in_registr = 2 then null
 	end as lic_vo_s
 from org_inf 
@@ -327,8 +369,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 9 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 9 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - Магистратура%' or edu_level like '%Высшее образование - магистратура%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - Магистратура','Высшее образование - магистратура') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р’Рћ - РњР°РіРёСЃС‚СЂР°С‚СѓСЂР°%' or edu_level like '%Р’С‹СЃС€РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ - РјР°РіРёСЃС‚СЂР°С‚СѓСЂР°%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Р’Рћ - РњР°РіРёСЃС‚СЂР°С‚СѓСЂР°','Р’С‹СЃС€РµРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ - РјР°РіРёСЃС‚СЂР°С‚СѓСЂР°') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		--when included_in_registr = 2 then null
 	end as lic_vo_m 
 from org_inf 
@@ -358,10 +400,10 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 10 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 10 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%ВО - ПКВК%' or edu_level like '%ВО - подготовка кадров высшей квалификации%' or edu_level like '%Послевузовское профессиональное образование%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('ВО - ПКВК','ВО - подготовка кадров высшей квалификации','Послевузовское профессиональное образование') and license_status = 'Не действует' then 1
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р’Рћ - РџРљР’Рљ%' or edu_level like '%Р’Рћ - РїРѕРґРіРѕС‚РѕРІРєР° РєР°РґСЂРѕРІ РІС‹СЃС€РµР№ РєРІР°Р»РёС„РёРєР°С†РёРё%' or edu_level like '%РџРѕСЃР»РµРІСѓР·РѕРІСЃРєРѕРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Р’Рћ - РџРљР’Рљ','Р’Рћ - РїРѕРґРіРѕС‚РѕРІРєР° РєР°РґСЂРѕРІ РІС‹СЃС€РµР№ РєРІР°Р»РёС„РёРєР°С†РёРё','РџРѕСЃР»РµРІСѓР·РѕРІСЃРєРѕРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
 		--when included_in_registr = 2 then null
-	end as lic_vo_kvk --проверить		
+	end as lic_vo_kvk --РїСЂРѕРІРµСЂРёС‚СЊ		
 from org_inf 
 	left join razdel_1_2_2 r122
 		on org_inf.okpo = r122.okpo
@@ -390,8 +432,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 11 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 11 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Профессиональное обучение%' or edu_level like '%Профессиональная подготовка%' or edu_level like '%Программа профессиональной подготовки%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('Профессиональное обучение','Профессиональная подготовка','Программа профессиональной подготовки') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%РџСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СѓС‡РµРЅРёРµ%' or edu_level like '%РџСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅР°СЏ РїРѕРґРіРѕС‚РѕРІРєР°%' or edu_level like '%РџСЂРѕРіСЂР°РјРјР° РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕР№ РїРѕРґРіРѕС‚РѕРІРєРё%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and edu_level in ('РџСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СѓС‡РµРЅРёРµ','РџСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅР°СЏ РїРѕРґРіРѕС‚РѕРІРєР°','РџСЂРѕРіСЂР°РјРјР° РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕР№ РїРѕРґРіРѕС‚РѕРІРєРё') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		--when included_in_registr = 2 then null
 	end as lic_po
 from org_inf 
@@ -422,8 +464,8 @@ select --* --count(org_inf.okpo)
 	,case 
 		when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 12 and r122.gr3::int=1 and r122.gr4::int<>2 then 1 
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n = 12 and (r122.gr3::int<>1 or r122.gr4::int=2) then 0 
-		when r122.okpo is null and included_in_registr = 1 and (lower(edu_level) like '%дополнительное профессиональное образование%' or lower(edu_level) like '%дополнительное к начальному и среднему профессиональному образованию%' or lower(edu_level) like '%дополнительное к начальному, среднему и высшему профессиональному образованию%' or lower(edu_level) like '%дополнительное к среднему и высшему профессиональному образованию%' or lower(edu_level) like '%дополнительное к среднему профессиональному образованию%') and license_status <> 'Не действует' then 1
-		--when r122.okpo is null and included_in_registr = 1 and lower(edu_level) in ('дополнительное профессиональное образование','дополнительное к начальному и среднему профессиональному образованию','дополнительное к начальному, среднему и высшему профессиональному образованию','дополнительное к среднему и высшему профессиональному образованию','дополнительное к среднему профессиональному образованию') and license_status = 'Не действует' then 0
+		when r122.okpo is null and included_in_registr = 1 and (lower(edu_level) like '%РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%' or lower(edu_level) like '%РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє РЅР°С‡Р°Р»СЊРЅРѕРјСѓ Рё СЃСЂРµРґРЅРµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ%' or lower(edu_level) like '%РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє РЅР°С‡Р°Р»СЊРЅРѕРјСѓ, СЃСЂРµРґРЅРµРјСѓ Рё РІС‹СЃС€РµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ%' or lower(edu_level) like '%РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє СЃСЂРµРґРЅРµРјСѓ Рё РІС‹СЃС€РµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ%' or lower(edu_level) like '%РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє СЃСЂРµРґРЅРµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ%') and license_status <> 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 1
+		--when r122.okpo is null and included_in_registr = 1 and lower(edu_level) in ('РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ','РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє РЅР°С‡Р°Р»СЊРЅРѕРјСѓ Рё СЃСЂРµРґРЅРµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ','РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє РЅР°С‡Р°Р»СЊРЅРѕРјСѓ, СЃСЂРµРґРЅРµРјСѓ Рё РІС‹СЃС€РµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ','РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє СЃСЂРµРґРЅРµРјСѓ Рё РІС‹СЃС€РµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ','РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ Рє СЃСЂРµРґРЅРµРјСѓ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕРјСѓ РѕР±СЂР°Р·РѕРІР°РЅРёСЋ') and license_status = 'РќРµ РґРµР№СЃС‚РІСѓРµС‚' then 0
 		--when included_in_registr = 2 then null
 	end as lic_dpo
 from org_inf 
@@ -458,11 +500,13 @@ select --* --count(org_inf.okpo)
 		when r121.okpo is not null and included_in_registr = 1 and r121.str_n = 1 and r121.gr6::int=1 then 1
 		when r121.okpo is not null and included_in_registr = 1 and r121.str_n = 1 and r121.gr6::int=3 then 2 
 		when r121.okpo is not null and included_in_registr = 1 and r121.str_n = 1 and r121.gr3::int <> 1 and r121.gr7::int = 1 then 3 
-		when r121.okpo is null and included_in_registr = 1 and license_status in ('Действует','Действующее') then 1
-		when r121.okpo is null and included_in_registr = 1 and license_status in ('Приостановлено','Приостановлена в части филиалов') then 2
-		when r121.okpo is null and included_in_registr = 1 and license_status in ('Проект') then 3
+		when r121.okpo is null and included_in_registr = 1 and license_status in ('Р”РµР№СЃС‚РІСѓРµС‚','Р”РµР№СЃС‚РІСѓСЋС‰РµРµ') then 1
+		when r121.okpo is null and included_in_registr = 1 and license_status in ('РџСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅРѕ','РџСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅР° РІ С‡Р°СЃС‚Рё С„РёР»РёР°Р»РѕРІ') then 2
+		when r121.okpo is null and included_in_registr = 1 and license_status in ('РџСЂРѕРµРєС‚') then 3
 		--when included_in_registr = 2 then null
 		else null
+		--when included_in_registr = 2 then 99
+		--when included_in_registr = 1 then 100
 	end as status_lic_o
 from org_inf 
 	left join razdel_1_2_1 r121
@@ -470,10 +514,18 @@ from org_inf
 	left join statreg7_ron_matched 
 		on statreg7_ron_matched.okpo_id = org_inf.okpo or statreg7_ron_matched.pole_1 = org_inf.okpo
 )
-select okpo, status_lic_o
+select 
+	--count(*) 
+	okpo, status_lic_o
 from pam
-where status_lic_o is not null		
+where status_lic_o is not null --and okpo in (select okpo_id from statreg7_ron_matched where license_status is not null or license_status <> '')	
 --
+select * from statreg7_ron_matched srm
+where okpo_id = '07659239405002'
+
+select * from razdel_1_2_1 r
+where okpo = '48556557'
+
 
 --drop materialized view status_lic_dop
 create materialized view status_lic_dop as
@@ -485,10 +537,11 @@ select --* --count(org_inf.okpo)
 		when included_in_registr = 1 and r122.str_n = 1 and r122.gr4::int = 1 then 1
 		when included_in_registr = 1 and r122.str_n = 1 and r122.gr4::int in (3,4) then 2
 		when included_in_registr = 1 and r122.str_n = 1 and r122.gr5::int = 1 and r122.gr3::int <> 1 then 3
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дополнительное образование детей и взрослых%' or edu_level like '%Дополнительное образование%') and license_status in ('Действует','Действующее') then 1
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дополнительное образование детей и взрослых%' or edu_level like '%Дополнительное образование%') and license_status in ('Приостановлено','Приостановлена в части филиалов') then 2
-		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дополнительное образование детей и взрослых%' or edu_level like '%Дополнительное образование%') and license_status in ('Проект') then 3
-		when included_in_registr = 2 then null
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµС‚РµР№ Рё РІР·СЂРѕСЃР»С‹С…%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status in ('Р”РµР№СЃС‚РІСѓРµС‚','Р”РµР№СЃС‚РІСѓСЋС‰РµРµ') then 1
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµС‚РµР№ Рё РІР·СЂРѕСЃР»С‹С…%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status in ('РџСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅРѕ','РџСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅР° РІ С‡Р°СЃС‚Рё С„РёР»РёР°Р»РѕРІ') then 2
+		when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµС‚РµР№ Рё РІР·СЂРѕСЃР»С‹С…%' or edu_level like '%Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕР±СЂР°Р·РѕРІР°РЅРёРµ%') and license_status in ('РџСЂРѕРµРєС‚') then 3
+		--when included_in_registr = 2 then null
+		when included_in_registr in (1) and (r122.str_n = 1 or r122.okpo is null) then 100
 	end as status_lic_dop	
 from org_inf 
 	left join razdel_1_2_2 r122
@@ -504,9 +557,29 @@ from org_inf
 		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.okpo is null 
 )
-select okpo, status_lic_dop
+select 
+	--count(*)
+	okpo, status_lic_dop
 from pam
-where status_lic_dop is not null	
+where status_lic_dop = 100 and okpo in (select okpo from razdel_1_2_2) --and okpo in (select okpo_id from statreg7_ron_matched) --is not null	
+--
+
+select * from statreg7_ron_matched srm
+where okpo_id = '02538028580002'
+
+select * from statreg7_ron_matched_edu_level srm
+where okpo_id = '00035106305002'
+
+select * from razdel_1_2_2 r
+where okpo = '00035106305002'
+
+
+select *
+from statregistr7 s
+where pole_1 = '40957251'
+and in_vyborka is not null
+group by pole_74
+
 
 --
 --update razdel_1_2_2
@@ -831,26 +904,39 @@ where dop_dod_adap_fs = 1
 --
 --pustota
 with pam as (
+
 select count(org_inf.okpo)
-	--org_inf.okpo
-	--,case 
-		--when included_in_registr = 2 or r2 is null then 1
-		--when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 4 and r2.gr6::int = 0 then 0
-	--end as dop_dod_adap_fs
+--org_inf.okpo
+--	,case 
+--		when included_in_registr = 2 or r2 is null then 1
+--		when included_in_registr = 1 and is_dod = 1 and r11.org_ovz::int in (1,2,3) and r2.str_n::int = 4 and r2.gr6::int = 0 then 0
+--	end as dop_dod_adap_fs
 from org_inf 
 	 join razdel_2 r2
 		on org_inf.okpo = r2.okpo
 	 join razdel_1_1 r11 on org_inf.okpo=r11.okpo
 --where r2.str_n::int = 11
-where included_in_registr = 1 and is_dod = 1 and r2.str_n::int = 4 and (r2.gr6::int = 0 or r2.gr6 is null) or 
-(r11.org_ovz::int in (1,2,3))
+where included_in_registr = 1 and r2.str_n::int = 4 and ((r2.gr6::int = 0) or (r11.org_ovz::int not in (1,2,3) or r11.org_ovz is null))
+
 )
 --select okpo, dop_dod_adap_fs
 --from pam
 --where dop_dod_adap_fs is not null	
-select count(distinct okpo)
+select count(*)
 from pam
 where dop_dod_adap_fs 
+
+select count(r.okpo)
+from org_inf 
+	 join razdel_2 r
+on org_inf.okpo = r.okpo
+where included_in_registr = 1 and str_n = 4
+group by gr6
+
+select org_ovz, count(okpo)
+from razdel_1_1 r 
+group by org_ovz
+
 
 select count(*)
 from org_inf 
@@ -891,4 +977,31 @@ where left(okpo,8) in (select noreg_pole_1 from noreg_org) and status <> '1'
 select *
 from statregistr7 s
 where pole_1 = '52186865'
+
+
+select --count(*) 
+	*
+from org_inf oi
+where oi.included_in_registr = 2 and okpo in (select okpo_id from statreg7_ron_matched srm)
+
+
+select * --count(*)
+from statreg7_ron_matched srm
+where okpo_id = '48556557'
+
+select --org_type,
+count(*)
+from org_inf oi join razdel_1_1 r11 on oi.okpo=r11.okpo
+where included_in_registr = 1 and org_type in ('7','8','9')
+group by org_type
+
+
+select org_type,count(*)
+from org_inf oi
+left join statregistr7 s on oi.okpo = s.pole_1 or oi.okpo = s.pole_3
+join razdel_1_1 r11 on oi.okpo = r11.okpo
+where --org_type_p21 = '01' and 
+included_in_registr in (1,2) and s.org_type_p21 is null
+group by org_type
+
 	

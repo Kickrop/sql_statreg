@@ -160,10 +160,10 @@ from
 	left join noreg_org on oi.okpo = noreg_org.okpo
 where included_in_registr in (1,2)		
 )
-select --*
-dop_dod_adap_raz,count(*)
+select *
+--dop_dod_adap_raz,count(*)
 from registr 
-group by dop_dod_adap_raz
+--group by dop_dod_adap_raz
 --where left(short_name,5) like '%85-Ê%'
 
 --where lic_ron = 0
@@ -202,12 +202,13 @@ group by dop_dod_adap_raz
 
 --drop table statregistr7 cascade
 --DROP MATERIALIZED VIEW statregistr.status_lic_o;
+--DROP MATERIALIZED view registr
 
-select dop_dod_adap_fs,count(okpo) from dop_dod_adap_fs
-group by dop_dod_adap_fs
-
-select count(okpo) from dop_dod_adap_fs
-where dop_dod_adap_fs is null
-
-
-select count(distinct okpo) from razdel_2 r
+--select dop_dod_adap_fs,count(okpo) from dop_dod_adap_fs
+--group by dop_dod_adap_fs
+--
+--select count(okpo) from dop_dod_adap_fs
+--where dop_dod_adap_fs is null
+--
+--
+--select count(distinct okpo) from razdel_2 r

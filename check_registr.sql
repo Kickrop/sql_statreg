@@ -166,3 +166,4 @@ join (select name_field,sum(col) vsego from check_registr group by name_field) x
 ORDER BY check_registr.name_field
 
 
+--select * from registr where predpr_type = '4'

@@ -342,4 +342,12 @@ insert into additional_okved values ('53250273','2','2','85.41')
 --select * from additional_okved r
 where okpo = '53250273' and str_n = '2' and n_okved_add = '2'
 
+--25 12 2019
+update statregistr7
+set pole_74 = '3'
+where pole_1 = '40957251'
+
+select *
+from statregistr7
+where pole_1 = '40957251'
 
