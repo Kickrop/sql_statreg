@@ -66,8 +66,10 @@ select --* --count(org_inf.okpo)
 		--when r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2 then 1
 		
 		--when r122.okpo is null and included_in_registr = 1 and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status not like '%Не действует%' then 1
-		when (r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2) or		
-		(included_in_registr = 1 and (edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status not like '%Не действует%') then 1
+		when included_in_registr = 2 then null
+		when (r122.okpo is not null and included_in_registr = 1 and r122.str_n::int = 2 and r122.gr3::int=1 and r122.gr4::int<>2) then 1--or	
+		when r122.okpo is null and ((edu_level like '%Дошкольное образование%' or edu_level like '%Дополнительное дошкольное образование%') and license_status not like '%Не действует%') then 1
+		--when included_in_registr = 2 then null
 
 	end as lic_do 
 from org_inf 
@@ -84,9 +86,11 @@ from org_inf
 		on aokv.okpo_id = statreg7_ron_matched.okpo_id
 --where r122.str_n::int = 2 and included_in_registr in (1,2)
 )
-SELECT distinct okpo, lic_do --count(distinct okpo) --
+SELECT --lic_do, count(distinct okpo)
+	distinct okpo, lic_do --count(distinct okpo) --
 from pam
 where lic_do is not null 
+--group by lic_do
 --full join query_lic_do_accb on pam.okpo=query_lic_do_accb.﻿okpo
 --where lic_do is not null and okpo not in (select * from query_lic_do_accb) --(pam.okpo is null or query_lic_do_accb.﻿okpo is null)
 
@@ -1004,4 +1008,9 @@ where --org_type_p21 = '01' and
 included_in_registr in (1,2) and s.org_type_p21 is null
 group by org_type
 
+
+
+select lic_do, count(*)
+from registr
+group by lic_do
 	
