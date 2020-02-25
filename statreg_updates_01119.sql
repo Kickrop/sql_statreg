@@ -351,3 +351,127 @@ select *
 from statregistr7
 where pole_1 = '40957251'
 
+
+--updates 27/01/2020 r121
+update statregistr.razdel_1_2_1
+set gr4 = x.gr4
+from (select okpo_id,"new" as gr4 from statregistr.reg_num_upd_27012020) x
+where x.okpo_id = statregistr.razdel_1_2_1.okpo
+--
+
+update statregistr.razdel_1_2_1
+set gr5 = x.gr5
+from (select okpo_id,"new" as gr5 from statregistr.date_lic_27012020) x
+where x.okpo_id = statregistr.razdel_1_2_1.okpo
+--
+
+update statregistr.razdel_1_2_1
+set gr6 = x.gr6
+from (select okpo_id,"new" as gr6 from statregistr.code_status_27012020) x
+where x.okpo_id = statregistr.razdel_1_2_1.okpo
+
+
+--updates 17/02/2020 r121
+update statregistr.razdel_1_2_1
+set gr4 = x.gr4
+from (select okpo_id,"new" as gr4 from statregistr.reg_num_upd_17022020) x
+where x.okpo_id = statregistr.razdel_1_2_1.okpo
+--
+
+update statregistr.razdel_1_2_1
+set gr5 = x.gr5
+from (select okpo,"new" as gr5 from statregistr.date_lic_17022020) x
+where x.okpo_id = statregistr.razdel_1_2_1.okpo	
+--
+update statregistr.razdel_1_2_1
+set gr5 = '01.01.2001'
+where okpo = '61244064'
+
+update statregistr.razdel_1_2_1
+set gr5 = '10.08.2002'
+where okpo = '02121794'
+
+update statregistr.razdel_1_2_1
+set gr5 = '10.08.2002'
+where okpo = '02121794'
+
+update statregistr.razdel_1_2_1
+set gr4 = '165'
+where okpo = '02121794'
+
+update statregistr.razdel_1_2_1
+set gr5 = '12.03.2009'
+where okpo = '02121825'
+
+update statregistr.razdel_1_2_1
+set gr4 = '658'
+where okpo = '02121825'
+
+update statregistr.razdel_1_2_1
+set gr5 = '01.01.2001'
+where okpo = '02673619'
+
+update statregistr.razdel_1_2_1
+set gr4 = '1'
+where okpo = '02673619'
+
+
+select status_lic_dop, count(*)
+from registr
+group by status_lic_dop
+
+
+--updates 19/02/2020 r121
+update statregistr.razdel_1_2_1
+set gr4 = '123'
+where okpo = '48429020' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '1111'
+where okpo = '61244064' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '1111'
+where okpo = '74228411' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '2268'
+where okpo = '13748148' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '2227'
+where okpo = '32697942' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '2235'
+where okpo = '32699929' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '2395'
+where okpo = '32715108' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '6366'
+where okpo = '40655260' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '4066'
+where okpo = '40907974' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '5999'
+where okpo = '41404376' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '0648'
+where okpo = '41442313' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr4 = '09-2428'
+where okpo = '41447871' and str_n = 1
+
+update statregistr.razdel_1_2_1
+set gr5 = '31.07.2015'
+where okpo = '62880425' and str_n = 1
+
+
